@@ -24,10 +24,10 @@ import org.xmlpull.v1.*;
 /**
  * XML writer implementation that uses XML Pull.
  *
- * @author  G. Meinders
+ * @author G. Meinders
  */
 class XmlPullWriter
-	implements XMLWriter
+implements XMLWriter
 {
 	/**
 	 * XML Pull serializer to be used.
@@ -40,15 +40,15 @@ class XmlPullWriter
 	private final String _encoding;
 
 	/**
-	 * <code>true</code> if the writer is currently writing an empty tag.
+	 * {@code true} if the writer is currently writing an empty tag.
 	 */
 	private boolean _empty = false;
 
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param   serializer  XML Pull serializer to be used.
-	 * @param   encoding    Character encoding of the XML document.
+	 * @param serializer XML Pull serializer to be used.
+	 * @param encoding   Character encoding of the XML document.
 	 */
 	XmlPullWriter( final XmlSerializer serializer, final String encoding )
 	{
@@ -56,34 +56,37 @@ class XmlPullWriter
 		_encoding = encoding;
 	}
 
+	@Override
 	public void setPrefix( @NotNull final String prefix, @NotNull final String namespaceURI )
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
 			_serializer.setPrefix( prefix, namespaceURI );
 		}
-		catch ( Exception e )
+		catch ( final Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void startDocument()
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
 			_serializer.startDocument( _encoding, null );
 		}
-		catch ( Exception e )
+		catch ( final Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void startTag( final String namespaceURI, @NotNull final String localName )
-		throws XMLException
+	throws XMLException
 	{
 		if ( _empty )
 		{
@@ -94,34 +97,37 @@ class XmlPullWriter
 		{
 			_serializer.startTag( namespaceURI, localName );
 		}
-		catch ( Exception e )
+		catch ( final Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void emptyTag( @Nullable final String namespaceURI, @NotNull final String localName )
-		throws XMLException
+	throws XMLException
 	{
 		startTag( namespaceURI, localName );
 		_empty = true;
 	}
 
+	@Override
 	public void attribute( final String namespaceURI, @NotNull final String localName, @NotNull final String value )
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
 			_serializer.attribute( namespaceURI, localName, value );
 		}
-		catch ( Exception e )
+		catch ( final Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void text( @NotNull final String characters )
-		throws XMLException
+	throws XMLException
 	{
 		if ( _empty )
 		{
@@ -132,14 +138,15 @@ class XmlPullWriter
 		{
 			_serializer.text( characters );
 		}
-		catch ( Exception e )
+		catch ( final Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void endTag( final String namespaceURI, @NotNull final String localName )
-		throws XMLException
+	throws XMLException
 	{
 		if ( _empty )
 		{
@@ -150,33 +157,35 @@ class XmlPullWriter
 		{
 			_serializer.endTag( namespaceURI, localName );
 		}
-		catch ( Exception e )
+		catch ( final Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void endDocument()
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
 			_serializer.endDocument();
 		}
-		catch ( Exception e )
+		catch ( final Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void flush()
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
 			_serializer.flush();
 		}
-		catch ( Exception e )
+		catch ( final Exception e )
 		{
 			throw new XMLException( e );
 		}

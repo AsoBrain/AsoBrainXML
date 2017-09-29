@@ -24,15 +24,15 @@ import javax.xml.stream.*;
 /**
  * XML writer factory for writers that use StAX, the Streaming API for XML.
  *
- * @author  G. Meinders
+ * @author G. Meinders
  */
 class StaxWriterFactory
-	extends XMLWriterFactory
+extends XMLWriterFactory
 {
 	/**
 	 * Factory used to created StAX writers.
 	 */
-	private XMLOutputFactory _factory;
+	private final XMLOutputFactory _factory;
 
 	/**
 	 * Constructs a new instance.
@@ -43,7 +43,7 @@ class StaxWriterFactory
 		{
 			_factory = XMLOutputFactory.newFactory();
 		}
-		catch ( javax.xml.stream.FactoryConfigurationError e )
+		catch ( final FactoryConfigurationError e )
 		{
 			throw new FactoryException( e );
 		}
@@ -51,14 +51,14 @@ class StaxWriterFactory
 
 	@Override
 	public XMLWriter createXMLWriter( final OutputStream out, final String encoding )
-		throws XMLException
+	throws XMLException
 	{
 		XMLStreamWriter writer;
 		try
 		{
 			writer = _factory.createXMLStreamWriter( out, encoding );
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
@@ -76,14 +76,14 @@ class StaxWriterFactory
 
 	@Override
 	public XMLWriter createXMLWriter( final Writer writer, final String encoding )
-		throws XMLException
+	throws XMLException
 	{
 		XMLStreamWriter xmlStreamWriter;
 		try
 		{
 			xmlStreamWriter = _factory.createXMLStreamWriter( writer );
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}

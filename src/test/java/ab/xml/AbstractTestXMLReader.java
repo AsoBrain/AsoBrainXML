@@ -26,26 +26,25 @@ import org.jetbrains.annotations.*;
 /**
  * Provides common unit tests for {@link XMLReader} classes.
  *
- * @author  G. Meinders
+ * @author G. Meinders
  */
 public abstract class AbstractTestXMLReader
-	extends TestCase
+extends TestCase
 {
 	/**
-	 * Factory that creates the <code>XMLReader</code>s to be tested.
+	 * Factory that creates the {@code XMLReader}s to be tested.
 	 */
-	protected XMLReaderFactory _factory;
+	protected XMLReaderFactory _factory = null;
 
 	/**
-	 * Tests that the reader returns all the appropriate events for the
-	 * input document, <code>TestXMLReader-1.xml</code>. The document for this
-	 * test should be small, but should still require all interface methods to
-	 * be read.
+	 * Tests that the reader returns all the appropriate events for the input
+	 * document, {@code TestXMLReader-1.xml}. The document for this test should
+	 * be small, but should still require all interface methods to be read.
 	 *
-	 * @throws  Exception if the test fails.
+	 * @throws Exception if the test fails.
 	 */
 	public void testDocument1()
-		throws Exception
+	throws Exception
 	{
 		System.out.println( getClass().getName() + ".testDocument1()" );
 		final XMLReader reader = _factory.createXMLReader( AbstractTestXMLReader.class.getResourceAsStream( "TestXMLReader-1.xml" ), null );
@@ -177,15 +176,15 @@ public abstract class AbstractTestXMLReader
 	}
 
 	/**
-	 * Tests that the reader returns all the appropriate events for the
-	 * input document, <code>TestXMLReader-2.xml</code>. This test focuses on
-	 * coalescing of character events using a simple XHTML document with
-	 * 5 paragraphs of "Lorem Ipsum".
+	 * Tests that the reader returns all the appropriate events for the input
+	 * document, {@code TestXMLReader-2.xml}. This test focuses on coalescing of
+	 * character events using a simple XHTML document with 5 paragraphs of
+	 * "Lorem Ipsum".
 	 *
-	 * @throws  XMLException if the test fails.
+	 * @throws XMLException if the test fails.
 	 */
 	public void testDocument2()
-		throws XMLException
+	throws XMLException
 	{
 		System.out.println( getClass().getName() + ".testDocument2()" );
 		final XMLReader reader = _factory.createXMLReader( TestStaxReader.class.getResourceAsStream( "TestXMLReader-2.xml" ), null );
@@ -247,20 +246,20 @@ public abstract class AbstractTestXMLReader
 
 		assertEquals( "Unexpected event type.", XMLEventType.CHARACTERS, reader.next() );
 		assertEquals( "Unexpected character data.", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam\n" +
-				"\t\t\tvehicula fermentum nibh, at placerat tellus hendrerit at. Quisque ac\n" +
-				"\t\t\tarcu vel libero suscipit posuere. Sed mauris est, tristique egestas\n" +
-				"\t\t\tmattis a, convallis et massa. Aliquam non sapien in augue dapibus\n" +
-				"\t\t\tcursus. Cum sociis natoque penatibus et magnis dis parturient\n" +
-				"\t\t\tmontes, nascetur ridiculus mus. Fusce in aliquet eros. Sed vitae\n" +
-				"\t\t\ttortor eu neque varius accumsan vitae rhoncus est. Praesent in nisl\n" +
-				"\t\t\turna. Curabitur rhoncus lacinia tellus, eu pretium nulla vulputate\n" +
-				"\t\t\tsit amet. Maecenas laoreet, sem fringilla laoreet consequat, nibh\n" +
-				"\t\t\tsapien fringilla odio, sed hendrerit magna massa vel urna. Cras\n" +
-				"\t\t\ttempor, turpis in tempus ullamcorper, velit nisl eleifend lorem, sit\n" +
-				"\t\t\tamet ultricies erat tellus nec purus. Mauris consectetur sodales\n" +
-				"\t\t\tnunc, vitae varius augue blandit ut. Ut congue, sapien non\n" +
-				"\t\t\tsollicitudin adipiscing, nisi nisl ultricies lectus, quis fermentum\n" +
-				"\t\t\torci tellus vel tortor.", reader.getText().trim() );
+		                                            "\t\t\tvehicula fermentum nibh, at placerat tellus hendrerit at. Quisque ac\n" +
+		                                            "\t\t\tarcu vel libero suscipit posuere. Sed mauris est, tristique egestas\n" +
+		                                            "\t\t\tmattis a, convallis et massa. Aliquam non sapien in augue dapibus\n" +
+		                                            "\t\t\tcursus. Cum sociis natoque penatibus et magnis dis parturient\n" +
+		                                            "\t\t\tmontes, nascetur ridiculus mus. Fusce in aliquet eros. Sed vitae\n" +
+		                                            "\t\t\ttortor eu neque varius accumsan vitae rhoncus est. Praesent in nisl\n" +
+		                                            "\t\t\turna. Curabitur rhoncus lacinia tellus, eu pretium nulla vulputate\n" +
+		                                            "\t\t\tsit amet. Maecenas laoreet, sem fringilla laoreet consequat, nibh\n" +
+		                                            "\t\t\tsapien fringilla odio, sed hendrerit magna massa vel urna. Cras\n" +
+		                                            "\t\t\ttempor, turpis in tempus ullamcorper, velit nisl eleifend lorem, sit\n" +
+		                                            "\t\t\tamet ultricies erat tellus nec purus. Mauris consectetur sodales\n" +
+		                                            "\t\t\tnunc, vitae varius augue blandit ut. Ut congue, sapien non\n" +
+		                                            "\t\t\tsollicitudin adipiscing, nisi nisl ultricies lectus, quis fermentum\n" +
+		                                            "\t\t\torci tellus vel tortor.", reader.getText().trim() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_ELEMENT, reader.next() );
 		assertEquals( "Unexpected namespace URI.", "http://www.w3.org/1999/xhtml", reader.getNamespaceURI() );
@@ -276,15 +275,15 @@ public abstract class AbstractTestXMLReader
 
 		assertEquals( "Unexpected event type.", XMLEventType.CHARACTERS, reader.next() );
 		assertEquals( "Unexpected character data.", "Pellentesque id metus lorem, vel suscipit ipsum. Curabitur\n" +
-				"\t\t\tscelerisque consequat dictum. Pellentesque habitant morbi tristique\n" +
-				"\t\t\tsenectus et netus et malesuada fames ac turpis egestas. Ut vulputate\n" +
-				"\t\t\tneque et sapien auctor semper accumsan dui aliquet. Cum sociis\n" +
-				"\t\t\tnatoque penatibus et magnis dis parturient montes, nascetur\n" +
-				"\t\t\tridiculus mus. Vivamus aliquet odio sed sem rutrum posuere. Maecenas\n" +
-				"\t\t\tsuscipit tortor lorem, eget porta erat. Donec ac nibh a massa\n" +
-				"\t\t\tdapibus tempus sed eu lorem. Maecenas et est eros. Nunc feugiat dui\n" +
-				"\t\t\tfringilla purus gravida egestas. Pellentesque habitant morbi\n" +
-				"\t\t\ttristique senectus et netus et malesuada fames ac turpis egestas.", reader.getText().trim() );
+		                                            "\t\t\tscelerisque consequat dictum. Pellentesque habitant morbi tristique\n" +
+		                                            "\t\t\tsenectus et netus et malesuada fames ac turpis egestas. Ut vulputate\n" +
+		                                            "\t\t\tneque et sapien auctor semper accumsan dui aliquet. Cum sociis\n" +
+		                                            "\t\t\tnatoque penatibus et magnis dis parturient montes, nascetur\n" +
+		                                            "\t\t\tridiculus mus. Vivamus aliquet odio sed sem rutrum posuere. Maecenas\n" +
+		                                            "\t\t\tsuscipit tortor lorem, eget porta erat. Donec ac nibh a massa\n" +
+		                                            "\t\t\tdapibus tempus sed eu lorem. Maecenas et est eros. Nunc feugiat dui\n" +
+		                                            "\t\t\tfringilla purus gravida egestas. Pellentesque habitant morbi\n" +
+		                                            "\t\t\ttristique senectus et netus et malesuada fames ac turpis egestas.", reader.getText().trim() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_ELEMENT, reader.next() );
 		assertEquals( "Unexpected namespace URI.", "http://www.w3.org/1999/xhtml", reader.getNamespaceURI() );
@@ -300,14 +299,14 @@ public abstract class AbstractTestXMLReader
 
 		assertEquals( "Unexpected event type.", XMLEventType.CHARACTERS, reader.next() );
 		assertEquals( "Unexpected character data.", "Pellentesque habitant morbi tristique senectus et netus et malesuada\n" +
-				"\t\t\tfames ac turpis egestas. Donec fermentum justo ut dolor dictum\n" +
-				"\t\t\ttincidunt aliquam mauris egestas. Donec eget eros augue, sed tempus\n" +
-				"\t\t\tdolor. Integer elit est, porttitor id rutrum sed, adipiscing nec\n" +
-				"\t\t\tnisi. Vivamus turpis lectus, egestas sed faucibus eu, ullamcorper\n" +
-				"\t\t\teget dolor. Sed vitae sem ac sapien pulvinar dapibus. Vestibulum\n" +
-				"\t\t\tlobortis, ligula vel condimentum rutrum, nunc nisl sollicitudin\n" +
-				"\t\t\tmetus, a cursus turpis orci et mauris. Nunc quis mauris elit, quis\n" +
-				"\t\t\tsodales justo.", reader.getText().trim() );
+		                                            "\t\t\tfames ac turpis egestas. Donec fermentum justo ut dolor dictum\n" +
+		                                            "\t\t\ttincidunt aliquam mauris egestas. Donec eget eros augue, sed tempus\n" +
+		                                            "\t\t\tdolor. Integer elit est, porttitor id rutrum sed, adipiscing nec\n" +
+		                                            "\t\t\tnisi. Vivamus turpis lectus, egestas sed faucibus eu, ullamcorper\n" +
+		                                            "\t\t\teget dolor. Sed vitae sem ac sapien pulvinar dapibus. Vestibulum\n" +
+		                                            "\t\t\tlobortis, ligula vel condimentum rutrum, nunc nisl sollicitudin\n" +
+		                                            "\t\t\tmetus, a cursus turpis orci et mauris. Nunc quis mauris elit, quis\n" +
+		                                            "\t\t\tsodales justo.", reader.getText().trim() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_ELEMENT, reader.next() );
 		assertEquals( "Unexpected namespace URI.", "http://www.w3.org/1999/xhtml", reader.getNamespaceURI() );
@@ -323,11 +322,11 @@ public abstract class AbstractTestXMLReader
 
 		assertEquals( "Unexpected event type.", XMLEventType.CHARACTERS, reader.next() );
 		assertEquals( "Unexpected character data.", "Morbi eu velit eu sem viverra laoreet. Phasellus luctus lacinia\n" +
-				"\t\t\tmauris in ultrices. Integer at eros ac arcu malesuada sodales ac nec\n" +
-				"\t\t\tenim. Vivamus at arcu ut massa volutpat ultrices. Praesent rhoncus\n" +
-				"\t\t\trutrum lorem ut placerat. Nam imperdiet sapien ac sem porta\n" +
-				"\t\t\tvolutpat. Nam lobortis eleifend lectus vel lacinia. Ut massa sapien,\n" +
-				"\t\t\tsagittis ac ornare non, lobortis at dui.", reader.getText().trim() );
+		                                            "\t\t\tmauris in ultrices. Integer at eros ac arcu malesuada sodales ac nec\n" +
+		                                            "\t\t\tenim. Vivamus at arcu ut massa volutpat ultrices. Praesent rhoncus\n" +
+		                                            "\t\t\trutrum lorem ut placerat. Nam imperdiet sapien ac sem porta\n" +
+		                                            "\t\t\tvolutpat. Nam lobortis eleifend lectus vel lacinia. Ut massa sapien,\n" +
+		                                            "\t\t\tsagittis ac ornare non, lobortis at dui.", reader.getText().trim() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_ELEMENT, reader.next() );
 		assertEquals( "Unexpected namespace URI.", "http://www.w3.org/1999/xhtml", reader.getNamespaceURI() );
@@ -343,16 +342,16 @@ public abstract class AbstractTestXMLReader
 
 		assertEquals( "Unexpected event type.", XMLEventType.CHARACTERS, reader.next() );
 		assertEquals( "Unexpected character data.", "Integer ut elit a urna interdum facilisis. Quisque in odio at lacus\n" +
-				"\t\t\tsodales porta. Mauris aliquam sodales tellus at scelerisque. Nulla\n" +
-				"\t\t\tfacilisi. Nunc cursus feugiat turpis, vitae faucibus urna\n" +
-				"\t\t\tpellentesque id. Suspendisse volutpat tortor sit amet dui adipiscing\n" +
-				"\t\t\tnec hendrerit mi tempor. Maecenas a libero et orci varius pharetra\n" +
-				"\t\t\ttincidunt at magna. Nullam a massa ipsum. Quisque placerat, sapien\n" +
-				"\t\t\tvitae mattis ornare, neque mi luctus lacus, sed tincidunt leo erat\n" +
-				"\t\t\teget dui. Sed gravida mi tellus, sed consequat mi. Curabitur\n" +
-				"\t\t\tsollicitudin placerat arcu ultrices scelerisque. Maecenas non arcu\n" +
-				"\t\t\tvitae lorem dictum aliquam. Donec vitae est et orci posuere\n" +
-				"\t\t\tscelerisque.", reader.getText().trim() );
+		                                            "\t\t\tsodales porta. Mauris aliquam sodales tellus at scelerisque. Nulla\n" +
+		                                            "\t\t\tfacilisi. Nunc cursus feugiat turpis, vitae faucibus urna\n" +
+		                                            "\t\t\tpellentesque id. Suspendisse volutpat tortor sit amet dui adipiscing\n" +
+		                                            "\t\t\tnec hendrerit mi tempor. Maecenas a libero et orci varius pharetra\n" +
+		                                            "\t\t\ttincidunt at magna. Nullam a massa ipsum. Quisque placerat, sapien\n" +
+		                                            "\t\t\tvitae mattis ornare, neque mi luctus lacus, sed tincidunt leo erat\n" +
+		                                            "\t\t\teget dui. Sed gravida mi tellus, sed consequat mi. Curabitur\n" +
+		                                            "\t\t\tsollicitudin placerat arcu ultrices scelerisque. Maecenas non arcu\n" +
+		                                            "\t\t\tvitae lorem dictum aliquam. Donec vitae est et orci posuere\n" +
+		                                            "\t\t\tscelerisque.", reader.getText().trim() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_ELEMENT, reader.next() );
 		assertEquals( "Unexpected namespace URI.", "http://www.w3.org/1999/xhtml", reader.getNamespaceURI() );
@@ -382,113 +381,423 @@ public abstract class AbstractTestXMLReader
 	 * underlying XML API and I/O (represented by {@link XMLException}) are not
 	 * tested.
 	 *
-	 * @throws  XMLException if the test fails.
+	 * @throws XMLException if the test fails.
 	 */
 	public void testExceptionHandling()
-		throws XMLException
+	throws XMLException
 	{
 		System.out.println( getClass().getName() + ".testExceptionHandling()" );
 
 		final XMLReader reader = createReaderForContent( "<?xml version='1.0'?><!DOCTYPE root><root>characters<?pi?></root>" );
 
 		assertEquals( "Unexpected event type.", XMLEventType.START_DOCUMENT, reader.getEventType() );
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getNamespaceURI() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getLocalName() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() ); } catch ( IllegalStateException e ) { /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getNamespaceURI() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getLocalName() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
 
 		assertEquals( "Unexpected event type.", XMLEventType.DTD, reader.next() );
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getNamespaceURI() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getLocalName() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() ); } catch ( IllegalStateException e ) { /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getNamespaceURI() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getLocalName() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
 
 		assertEquals( "Unexpected event type.", XMLEventType.START_ELEMENT, reader.next() );
 		assertEquals( "Unexpected namespace URI.", null, reader.getNamespaceURI() );
 		assertEquals( "Unexpected local name.", "root", reader.getLocalName() );
 		assertEquals( "Unexpected attribute count.", 0, reader.getAttributeCount() );
-		try { throw new AssertionError( "Expected IndexOutOfBoundsException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) ); } catch ( IndexOutOfBoundsException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IndexOutOfBoundsException, but return value was: " + reader.getAttributeLocalName( 0 ) ); } catch ( IndexOutOfBoundsException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IndexOutOfBoundsException, but return value was: " + reader.getAttributeValue( 0 ) ); } catch ( IndexOutOfBoundsException e ) { /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IndexOutOfBoundsException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) );
+		}
+		catch ( IndexOutOfBoundsException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IndexOutOfBoundsException, but return value was: " + reader.getAttributeLocalName( 0 ) );
+		}
+		catch ( IndexOutOfBoundsException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IndexOutOfBoundsException, but return value was: " + reader.getAttributeValue( 0 ) );
+		}
+		catch ( IndexOutOfBoundsException e )
+		{ /* Success! */ }
 		assertNull( "Value of non-existent attribute should be null.", reader.getAttributeValue( null, "attribute" ) );
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() ); } catch ( IllegalStateException e ) { /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
 
 		assertEquals( "Unexpected event type.", XMLEventType.CHARACTERS, reader.next() );
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getNamespaceURI() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getLocalName() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) ); } catch ( IllegalStateException e ) { /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getNamespaceURI() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getLocalName() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
 		assertEquals( "Unexpected character data.", "characters", reader.getText() );
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() ); } catch ( IllegalStateException e ) { /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
 
 		assertEquals( "Unexpected event type.", XMLEventType.PROCESSING_INSTRUCTION, reader.next() );
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getNamespaceURI() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getLocalName() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() ); } catch ( IllegalStateException e ) { /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getNamespaceURI() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getLocalName() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
 		assertEquals( "Unexpected processing instruction target.", "pi", reader.getPITarget() );
 		assertEquals( "Unexpected processing instruction data.", "", reader.getPIData() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_ELEMENT, reader.next() );
 		assertEquals( "Unexpected namespace URI.", null, reader.getNamespaceURI() );
 		assertEquals( "Unexpected local name.", "root", reader.getLocalName() );
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() ); } catch ( IllegalStateException e ) { /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_DOCUMENT, reader.next() );
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.next() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getNamespaceURI() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getLocalName() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() ); } catch ( IllegalStateException e ) { /* Success! */ }
-		try { throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() ); } catch ( IllegalStateException e ) { /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.next() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getNamespaceURI() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getLocalName() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeCount() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeNamespaceURI( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeLocalName( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( 0 ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getAttributeValue( null, "attribute" ) );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getText() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPITarget() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
+		try
+		{
+			throw new AssertionError( "Expected IllegalStateException, but return value was: " + reader.getPIData() );
+		}
+		catch ( IllegalStateException e )
+		{ /* Success! */ }
 	}
 
 	/**
 	 * Creates a reader to read the given XML document. This method always uses
 	 * UTF-8 character encoding.
 	 *
-	 * @param   document   XML document.
+	 * @param document XML document.
 	 *
-	 * @return  XML reader.
+	 * @return XML reader.
 	 *
-	 * @throws  XMLException if an error occurs.
+	 * @throws XMLException if an error occurs.
 	 */
 	protected XMLReader createReaderForContent( final String document )
-		throws XMLException
+	throws XMLException
 	{
 		return createReaderForContent( document, "UTF-8" );
 	}
@@ -496,15 +805,15 @@ public abstract class AbstractTestXMLReader
 	/**
 	 * Creates a reader to read the given XML document.
 	 *
-	 * @param   document   XML document.
-	 * @param   encoding   Character encoding.
+	 * @param document XML document.
+	 * @param encoding Character encoding.
 	 *
-	 * @return  XML reader.
+	 * @return XML reader.
 	 *
-	 * @throws  XMLException if an error occurs.
+	 * @throws XMLException if an error occurs.
 	 */
 	protected XMLReader createReaderForContent( final String document, final String encoding )
-		throws XMLException
+	throws XMLException
 	{
 		final ByteArrayInputStream in;
 		try
@@ -521,12 +830,12 @@ public abstract class AbstractTestXMLReader
 	/**
 	 * Generates test code for a reference document read by the given reader.
 	 *
-	 * @param   reader  Reader to be used.
+	 * @param reader Reader to be used.
 	 *
-	 * @throws  XMLException if an XML-related error occurs.
+	 * @throws XMLException if an XML-related error occurs.
 	 */
 	protected static void generateTestCode( final XMLReader reader )
-		throws XMLException
+	throws XMLException
 	{
 		XMLEventType eventType;
 		do
@@ -628,7 +937,7 @@ public abstract class AbstractTestXMLReader
 	 * Prints the given string as a string literal. Does not escape characters
 	 * that are not allowed in string literals.
 	 *
-	 * @param   s   String to be printed.
+	 * @param s String to be printed.
 	 */
 	private static void printStringLiteral( @Nullable final String s )
 	{
@@ -653,14 +962,14 @@ public abstract class AbstractTestXMLReader
 	 * XMLEventType nonWhitespace = ignoreWhiteSpace( reader );
 	 * </pre>
 	 *
-	 * @param   reader  Reader to be used.
+	 * @param reader Reader to be used.
 	 *
-	 * @return  Current event type.
+	 * @return Current event type.
 	 *
-	 * @throws  XMLException if the next event can't be read.
+	 * @throws XMLException if the next event can't be read.
 	 */
 	protected XMLEventType ignoreWhiteSpace( final XMLReader reader )
-		throws XMLException
+	throws XMLException
 	{
 		XMLEventType result = reader.next();
 		if ( ( result == XMLEventType.CHARACTERS ) && ( reader.getText().trim().isEmpty() ) )

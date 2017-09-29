@@ -23,18 +23,18 @@ import java.io.*;
 import org.xmlpull.v1.*;
 
 /**
- * XML writer factory for writers that use XML Pull. The main advantage of
- * XML Pull is its availability on Android (all versions).
+ * XML writer factory for writers that use XML Pull. The main advantage of XML
+ * Pull is its availability on Android (all versions).
  *
- * @author  G. Meinders
+ * @author G. Meinders
  */
 public class XmlPullWriterFactory
-	extends XMLWriterFactory
+extends XMLWriterFactory
 {
 	/**
 	 * Parser factory to create {@link XmlSerializer} instances with.
 	 */
-	private XmlPullParserFactory _parserFactory;
+	private final XmlPullParserFactory _parserFactory;
 
 	/**
 	 * Constructs a new instance.
@@ -46,7 +46,7 @@ public class XmlPullWriterFactory
 		{
 			parserFactory = XmlPullParserFactory.newInstance();
 		}
-		catch ( XmlPullParserException e )
+		catch ( final XmlPullParserException e )
 		{
 			throw new FactoryException( e );
 		}
@@ -55,14 +55,14 @@ public class XmlPullWriterFactory
 
 	@Override
 	public XMLWriter createXMLWriter( final OutputStream out, final String encoding )
-		throws XMLException
+	throws XMLException
 	{
 		XmlSerializer serializer;
 		try
 		{
 			serializer = _parserFactory.newSerializer();
 		}
-		catch ( XmlPullParserException e )
+		catch ( final XmlPullParserException e )
 		{
 			throw new XMLException( e );
 		}
@@ -71,7 +71,7 @@ public class XmlPullWriterFactory
 		{
 			serializer.setOutput( out, encoding );
 		}
-		catch ( IOException e )
+		catch ( final IOException e )
 		{
 			throw new XMLException( e );
 		}
@@ -89,14 +89,14 @@ public class XmlPullWriterFactory
 
 	@Override
 	public XMLWriter createXMLWriter( final Writer writer, final String encoding )
-		throws XMLException
+	throws XMLException
 	{
 		XmlSerializer serializer;
 		try
 		{
 			serializer = _parserFactory.newSerializer();
 		}
-		catch ( XmlPullParserException e )
+		catch ( final XmlPullParserException e )
 		{
 			throw new XMLException( e );
 		}
@@ -105,7 +105,7 @@ public class XmlPullWriterFactory
 		{
 			serializer.setOutput( writer );
 		}
-		catch ( IOException e )
+		catch ( final IOException e )
 		{
 			throw new XMLException( e );
 		}

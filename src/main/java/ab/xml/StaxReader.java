@@ -28,7 +28,7 @@ import org.jetbrains.annotations.*;
  * @author G. Meinders
  */
 class StaxReader
-	implements XMLReader
+implements XMLReader
 {
 	/**
 	 * StAX reader to be used.
@@ -44,7 +44,7 @@ class StaxReader
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param   reader  StAX reader to be used.
+	 * @param reader StAX reader to be used.
 	 */
 	StaxReader( final XMLStreamReader reader )
 	{
@@ -52,15 +52,17 @@ class StaxReader
 		_eventType = XMLEventType.START_DOCUMENT;
 	}
 
+	@Override
 	@NotNull
 	public XMLEventType getEventType()
 	{
 		return _eventType;
 	}
 
+	@Override
 	@NotNull
 	public XMLEventType next()
-		throws XMLException
+	throws XMLException
 	{
 		if ( _eventType == XMLEventType.END_DOCUMENT )
 		{
@@ -165,6 +167,7 @@ class StaxReader
 		return result;
 	}
 
+	@Override
 	public String getNamespaceURI()
 	{
 		final XMLEventType eventType = _eventType;
@@ -177,6 +180,7 @@ class StaxReader
 		return _reader.getNamespaceURI();
 	}
 
+	@Override
 	@NotNull
 	public String getLocalName()
 	{
@@ -190,6 +194,7 @@ class StaxReader
 		return _reader.getLocalName();
 	}
 
+	@Override
 	public int getAttributeCount()
 	{
 		final XMLEventType eventType = _eventType;
@@ -201,6 +206,7 @@ class StaxReader
 		return _reader.getAttributeCount();
 	}
 
+	@Override
 	public String getAttributeNamespaceURI( final int index )
 	{
 		final XMLEventType eventType = _eventType;
@@ -217,6 +223,7 @@ class StaxReader
 		return _reader.getAttributeNamespace( index );
 	}
 
+	@Override
 	@NotNull
 	public String getAttributeLocalName( final int index )
 	{
@@ -234,6 +241,7 @@ class StaxReader
 		return _reader.getAttributeLocalName( index );
 	}
 
+	@Override
 	@NotNull
 	public String getAttributeValue( final int index )
 	{
@@ -251,6 +259,7 @@ class StaxReader
 		return _reader.getAttributeValue( index );
 	}
 
+	@Override
 	public String getAttributeValue( @NotNull final String localName )
 	{
 		final XMLEventType eventType = _eventType;
@@ -274,6 +283,7 @@ class StaxReader
 		return result;
 	}
 
+	@Override
 	public String getAttributeValue( final String namespaceURI, @NotNull final String localName )
 	{
 		final XMLEventType eventType = _eventType;
@@ -285,6 +295,7 @@ class StaxReader
 		return _reader.getAttributeValue( namespaceURI, localName );
 	}
 
+	@Override
 	@NotNull
 	public String getText()
 	{
@@ -296,6 +307,7 @@ class StaxReader
 		return _reader.getText();
 	}
 
+	@Override
 	@NotNull
 	public String getPITarget()
 	{
@@ -307,6 +319,7 @@ class StaxReader
 		return _reader.getPITarget();
 	}
 
+	@Override
 	@NotNull
 	public String getPIData()
 	{

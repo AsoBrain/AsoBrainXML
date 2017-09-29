@@ -30,7 +30,7 @@ import org.xmlpull.v1.*;
  * @author G. Meinders
  */
 class XmlPullReader
-	implements XMLReader
+implements XMLReader
 {
 	/**
 	 * XML Pull parser to be used.
@@ -68,14 +68,14 @@ class XmlPullReader
 	 * Used to coalesce consecutive character data that is returned as separate
 	 * events by {@link XmlPullParser#nextToken()}.
 	 */
-	@SuppressWarnings ( "StringBufferField" )
+	@SuppressWarnings( "StringBufferField" )
 	@NotNull
 	private final StringBuilder _characterDataBuilder;
 
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param   parser  XML Pull parser to be used.
+	 * @param parser XML Pull parser to be used.
 	 */
 	XmlPullReader( @NotNull final XmlPullParser parser )
 	{
@@ -87,16 +87,17 @@ class XmlPullReader
 		_characterDataBuilder = new StringBuilder();
 	}
 
+	@Override
 	@NotNull
 	public XMLEventType getEventType()
 	{
 		return _eventType;
 	}
 
-	@SuppressWarnings ( "FieldRepeatedlyAccessedInMethod" )
+	@Override
 	@NotNull
 	public XMLEventType next()
-		throws XMLException
+	throws XMLException
 	{
 		if ( _eventType == XMLEventType.END_DOCUMENT )
 		{
@@ -247,10 +248,10 @@ class XmlPullReader
 	 * Combines the current character data event and any following character
 	 * data events into a single event.
 	 *
-	 * @throws  XMLException if an XML-related exception occurs.
+	 * @throws XMLException if an XML-related exception occurs.
 	 */
 	private void coalesceCharacterData()
-		throws XMLException
+	throws XMLException
 	{
 		final StringBuilder builder = _characterDataBuilder;
 		builder.append( _parser.getText() );
@@ -284,6 +285,7 @@ class XmlPullReader
 		_characterDataBuilder.setLength( 0 );
 	}
 
+	@Override
 	public String getNamespaceURI()
 	{
 		final XMLEventType eventType = _eventType;
@@ -296,6 +298,7 @@ class XmlPullReader
 		return _parser.getNamespace( _parser.getPrefix() );
 	}
 
+	@Override
 	@NotNull
 	public String getLocalName()
 	{
@@ -309,6 +312,7 @@ class XmlPullReader
 		return _parser.getName();
 	}
 
+	@Override
 	public int getAttributeCount()
 	{
 		if ( _eventType != XMLEventType.START_ELEMENT )
@@ -319,6 +323,7 @@ class XmlPullReader
 		return _parser.getAttributeCount();
 	}
 
+	@Override
 	public String getAttributeNamespaceURI( final int index )
 	{
 		if ( _eventType != XMLEventType.START_ELEMENT )
@@ -334,6 +339,7 @@ class XmlPullReader
 		return ( _parser.getAttributePrefix( index ) == null ) ? null : _parser.getAttributeNamespace( index );
 	}
 
+	@Override
 	@NotNull
 	public String getAttributeLocalName( final int index )
 	{
@@ -350,6 +356,7 @@ class XmlPullReader
 		return _parser.getAttributeName( index );
 	}
 
+	@Override
 	@NotNull
 	public String getAttributeValue( final int index )
 	{
@@ -366,6 +373,7 @@ class XmlPullReader
 		return _parser.getAttributeValue( index );
 	}
 
+	@Override
 	public String getAttributeValue( @NotNull final String localName )
 	{
 		final XMLEventType eventType = _eventType;
@@ -389,6 +397,7 @@ class XmlPullReader
 		return result;
 	}
 
+	@Override
 	public String getAttributeValue( final String namespaceURI, @NotNull final String localName )
 	{
 		if ( _eventType != XMLEventType.START_ELEMENT )
@@ -399,6 +408,7 @@ class XmlPullReader
 		return _parser.getAttributeValue( namespaceURI, localName );
 	}
 
+	@Override
 	@NotNull
 	public String getText()
 	{
@@ -410,6 +420,7 @@ class XmlPullReader
 		return ( _characterData != null ) ? _characterData : _parser.getText();
 	}
 
+	@Override
 	@NotNull
 	public String getPITarget()
 	{
@@ -422,6 +433,7 @@ class XmlPullReader
 		return _piTarget;
 	}
 
+	@Override
 	@NotNull
 	public String getPIData()
 	{

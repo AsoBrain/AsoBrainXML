@@ -35,14 +35,14 @@ import javax.xml.datatype.*;
 public class DatatypeConverter
 {
 	/**
-	 * Cached datatype factory instance.
+	 * Cached {@link DatatypeFactory} instance.
 	 */
-	private static DatatypeFactory _datatypeFactory;
+	private static DatatypeFactory _datatypeFactory = null;
 
 	/**
-	 * Returns a datatype factory.
+	 * Returns a {@link DatatypeFactory}.
 	 *
-	 * @return Datatype factory instance.
+	 * @return {@link DatatypeFactory} instance.
 	 */
 	private static DatatypeFactory getDatatypeFactory()
 	{
@@ -53,7 +53,7 @@ public class DatatypeConverter
 			{
 				result = DatatypeFactory.newInstance();
 			}
-			catch ( DatatypeConfigurationException e )
+			catch ( final DatatypeConfigurationException e )
 			{
 				throw new RuntimeException( e );
 			}
@@ -63,8 +63,8 @@ public class DatatypeConverter
 	}
 
 	/**
-	 * Converts the given calendar's date and time into a valid lexical value for
-	 * the XML Schema {@code dateTime} data type.
+	 * Converts the given calendar's date and time into a valid lexical value
+	 * for the XML Schema {@code dateTime} data type.
 	 *
 	 * @param calendar Calendar to be converted.
 	 *
@@ -88,8 +88,9 @@ public class DatatypeConverter
 	}
 
 	/**
-	 * Converts the given data-time value to a calendar instance. The given value
-	 * must be a valid lexical value of the XML Schema {@code dateTime} data type.
+	 * Converts the given data-time value to a calendar instance. The given
+	 * value must be a valid lexical value of the XML Schema {@code dateTime}
+	 * data type.
 	 *
 	 * @param value Value to be parsed.
 	 *
@@ -104,8 +105,8 @@ public class DatatypeConverter
 
 	/**
 	 * Converts the given data-time value to a {@link BigDecimal} instance. The
-	 * given value must be a valid lexical value of the XML Schema {@code decimal}
-	 * data type.
+	 * given value must be a valid lexical value of the XML Schema {@code
+	 * decimal} data type.
 	 *
 	 * @param value Value to be parsed.
 	 *

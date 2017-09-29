@@ -26,32 +26,33 @@ import org.jetbrains.annotations.*;
  * Factory for creating {@link XMLReader} instances using an XML API that is
  * available on the current platform.
  *
- * <p>
- * The following APIs are currently supported:
- * <ul>
- *   <li>Streaming API for XML (StAX)</li>
- *   <li>XML Pull</li>
- * </ul>
+ * <p> The following APIs are currently supported: <ul>
  *
- * @author  G. Meinders
+ * <li>Streaming API for XML (StAX)</li>
+ *
+ * <li>XML Pull</li> </ul>
+ *
+ * @author G. Meinders
  */
 public abstract class XMLReaderFactory
 {
 	/**
 	 * Class names of factory implementations.
 	 */
+	@SuppressWarnings( "SpellCheckingInspection" )
 	private static final String[] FACTORY_CLASS_NAMES =
 	{
-		"ab.xml.XmlPullReaderFactory", "ab.xml.StaxReaderFactory"
+	"ab.xml.XmlPullReaderFactory",
+	"ab.xml.StaxReaderFactory"
 	};
 
 	/**
 	 * Create a new factory that uses an XML API that is available on the
 	 * current platform.
 	 *
-	 * @return  Factory instance.
+	 * @return Factory instance.
 	 *
-	 * @throws  FactoryException if no factory can be loaded.
+	 * @throws FactoryException if no factory can be loaded.
 	 */
 	public static XMLReaderFactory newInstance()
 	{
@@ -59,23 +60,23 @@ public abstract class XMLReaderFactory
 
 		for ( final String className : FACTORY_CLASS_NAMES )
 		{
-			final Class<XMLReaderFactory> clazz;
 			try
 			{
 				//noinspection unchecked
-				clazz = (Class<XMLReaderFactory>)Class.forName( className );
-				result = clazz.newInstance();
+				final Class<XMLReaderFactory> clazz = (Class<XMLReaderFactory>)Class.forName( className );
+				//noinspection JavaReflectionMemberAccess
+				result = clazz.getConstructor().newInstance();
 				break;
 			}
-			catch ( FactoryException e )
+			catch ( final FactoryException e )
 			{
 				// Factory determined a problem. Use another factory.
 			}
-			catch ( NoClassDefFoundError e )
+			catch ( final NoClassDefFoundError e )
 			{
 				// If the underlying API is not available.
 			}
-			catch ( ClassNotFoundException e )
+			catch ( final ClassNotFoundException e )
 			{
 				/*
 				 * If the factory class doesn't exist.
@@ -83,7 +84,7 @@ public abstract class XMLReaderFactory
 				 */
 				throw new FactoryException( e );
 			}
-			catch ( IllegalAccessException e )
+			catch ( final IllegalAccessException e )
 			{
 				/*
 				 * If the factory class doesn't have a public constructor.
@@ -91,7 +92,7 @@ public abstract class XMLReaderFactory
 				 */
 				throw new FactoryException( e );
 			}
-			catch ( Throwable e )
+			catch ( final Throwable e )
 			{
 				/*
 				 * Any other problem with the factory probably indicates a
@@ -119,14 +120,14 @@ public abstract class XMLReaderFactory
 	/**
 	 * Creates an XML reader.
 	 *
-	 * @param   in          Stream to read from.
-	 * @param   encoding    Character encoding to be used;
-	 *                      <code>null</code> to detect automatically.
+	 * @param in       Stream to read from.
+	 * @param encoding Character encoding to be used; {@code null} to detect
+	 *                 automatically.
 	 *
-	 * @return  Created XML reader.
+	 * @return Created XML reader.
 	 *
-	 * @throws  XMLException if an XML-related exception occurs.
+	 * @throws XMLException if an XML-related exception occurs.
 	 */
 	public abstract XMLReader createXMLReader( @NotNull final InputStream in, @Nullable final String encoding )
-		throws XMLException;
+	throws XMLException;
 }

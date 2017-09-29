@@ -26,15 +26,15 @@ import org.jetbrains.annotations.*;
 /**
  * Factory for XML readers that use StAX, the Streaming API for XML.
  *
- * @author  G. Meinders
+ * @author G. Meinders
  */
 class StaxReaderFactory
-	extends XMLReaderFactory
+extends XMLReaderFactory
 {
 	/**
 	 * Factory used to create StAX readers.
 	 */
-	private XMLInputFactory _factory;
+	private final XMLInputFactory _factory;
 
 	/**
 	 * Constructs a new instance.
@@ -49,7 +49,7 @@ class StaxReaderFactory
 				// NOTE: For OpenJDK, this requires a file 'META-INF/services/com.sun.xml.internal.stream.XMLInputFactoryImpl' containing the factory class name.
 				factory = XMLInputFactory.newFactory( "com.sun.xml.internal.stream.XMLInputFactoryImpl", getClass().getClassLoader() );
 			}
-			catch ( FactoryConfigurationError e )
+			catch ( final FactoryConfigurationError ignored )
 			{
 				factory = XMLInputFactory.newFactory();
 				System.err.println( getClass().getName() + ": Using StAX factory class " + factory.getClass().getName() + ", which is not the recommended implementation." );
@@ -61,7 +61,7 @@ class StaxReaderFactory
 
 			_factory = factory;
 		}
-		catch ( FactoryConfigurationError e )
+		catch ( final FactoryConfigurationError e )
 		{
 			throw new FactoryException( e );
 		}
@@ -69,7 +69,7 @@ class StaxReaderFactory
 
 	@Override
 	public XMLReader createXMLReader( @NotNull final InputStream in, final String encoding )
-		throws XMLException
+	throws XMLException
 	{
 		final XMLStreamReader reader;
 		try
@@ -77,7 +77,7 @@ class StaxReaderFactory
 			final XMLInputFactory factory = _factory;
 			reader = factory.createXMLStreamReader( in, encoding );
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}

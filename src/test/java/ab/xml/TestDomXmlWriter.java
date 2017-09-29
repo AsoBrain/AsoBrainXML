@@ -27,19 +27,19 @@ import org.w3c.dom.*;
 /**
  * Test for the {@link DomXmlWriter} class.
  *
- * @author  Peter S. Heijnen
+ * @author G. Meinders
  */
 public class TestDomXmlWriter
-	extends TestCase
+extends TestCase
 {
 	/**
 	 * Tests that the writer can reproduce an XML document that is read using
 	 * the standard DOM parser.
 	 *
-	 * @throws  Exception if the test fails.
+	 * @throws Exception if the test fails.
 	 */
 	public void testDocument1()
-		throws Exception
+	throws Exception
 	{
 		System.out.println( "========================================================" );
 		final Document readDocument = readDocument( "TestDomXmlWriter.xml" );
@@ -62,14 +62,14 @@ public class TestDomXmlWriter
 	/**
 	 * Read XML file and return it as a DOM document.
 	 *
-	 * @param   path    XML file path.
+	 * @param path XML file path.
 	 *
-	 * @return  DOM document.
+	 * @return DOM document.
 	 *
-	 * @throws  Exception if the XML document could not be read properly.
+	 * @throws Exception if the XML document could not be read properly.
 	 */
 	private static Document readDocument( final String path )
-		throws Exception
+	throws Exception
 	{
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware( true );
@@ -80,23 +80,23 @@ public class TestDomXmlWriter
 	/**
 	 * Write DOM node to the specified XML writer.
 	 *
-	 * @param   writer      Writes the XML document.
-	 * @param   node        DOM node to write.
+	 * @param writer Writes the XML document.
+	 * @param node   DOM node to write.
 	 *
-	 * @throws  XMLException if there was a problem writing the XML document.
+	 * @throws XMLException if there was a problem writing the XML document.
 	 */
 	private void writeNode( final XMLWriter writer, final Node node )
-		throws XMLException
+	throws XMLException
 	{
 		switch ( node.getNodeType() )
 		{
 			case Node.DOCUMENT_NODE:
-				writeDocument( writer, (Document) node );
+				writeDocument( writer, (Document)node );
 
 				break;
 
 			case Node.ELEMENT_NODE:
-				writeElement( writer, (Element) node );
+				writeElement( writer, (Element)node );
 				break;
 
 			case Node.TEXT_NODE:
@@ -111,13 +111,13 @@ public class TestDomXmlWriter
 	/**
 	 * Write DOM document node to the specified XML writer.
 	 *
-	 * @param   writer      Writes the XML document.
-	 * @param   document    DOM document node to write.
+	 * @param writer   Writes the XML document.
+	 * @param document DOM document node to write.
 	 *
-	 * @throws  XMLException if there was a problem writing the XML document.
+	 * @throws XMLException if there was a problem writing the XML document.
 	 */
-	private void writeDocument( final XMLWriter writer, final Document document )
-		throws XMLException
+	private void writeDocument( final XMLWriter writer, @SuppressWarnings( "TypeMayBeWeakened" ) final Document document )
+	throws XMLException
 	{
 		writer.startDocument();
 		writeChildNodes( writer, document );
@@ -127,18 +127,18 @@ public class TestDomXmlWriter
 	/**
 	 * Write DOM element node to the specified XML writer.
 	 *
-	 * @param   writer      Writes the XML document.
-	 * @param   element     DOM element node to write.
+	 * @param writer  Writes the XML document.
+	 * @param element DOM element node to write.
 	 *
-	 * @throws  XMLException if there was a problem writing the XML document.
+	 * @throws XMLException if there was a problem writing the XML document.
 	 */
-	private void writeElement( final XMLWriter writer, final Element element )
-		throws XMLException
+	private void writeElement( final XMLWriter writer, @SuppressWarnings( "TypeMayBeWeakened" ) final Element element )
+	throws XMLException
 	{
 		final NamedNodeMap attributes = element.getAttributes();
 		if ( attributes != null )
 		{
-			for ( int i = 0 ; i < attributes.getLength(); i++ )
+			for ( int i = 0; i < attributes.getLength(); i++ )
 			{
 				final Node attribute = attributes.item( i );
 				if ( "xmlns".equals( attribute.getPrefix() ) )
@@ -160,7 +160,7 @@ public class TestDomXmlWriter
 
 		if ( attributes != null )
 		{
-			for ( int i = 0 ; i < attributes.getLength(); i++ )
+			for ( int i = 0; i < attributes.getLength(); i++ )
 			{
 				final Node attribute = attributes.item( i );
 				if ( !"xmlns".equals( attribute.getPrefix() ) )
@@ -178,13 +178,13 @@ public class TestDomXmlWriter
 	/**
 	 * Write child nodes of a DOM node to the specified XML writer.
 	 *
-	 * @param   writer      Writes the XML document.
-	 * @param   node        DOM node whose child nodes to write.
+	 * @param writer Writes the XML document.
+	 * @param node   DOM node whose child nodes to write.
 	 *
-	 * @throws  XMLException if there was a problem writing the XML document.
+	 * @throws XMLException if there was a problem writing the XML document.
 	 */
 	private void writeChildNodes( final XMLWriter writer, final Node node )
-		throws XMLException
+	throws XMLException
 	{
 		final NodeList childNodes = node.getChildNodes();
 		if ( childNodes != null )
@@ -199,14 +199,14 @@ public class TestDomXmlWriter
 	/**
 	 * Write node as text.
 	 *
-	 * @param   out         Character stream to write output to.
-	 * @param   indent      Indent to use for output.
-	 * @param   node        Node to write.
+	 * @param out    Character stream to write output to.
+	 * @param indent Indent to use for output.
+	 * @param node   Node to write.
 	 *
-	 * @throws  IOException if an error occurs while accessing resources.
+	 * @throws IOException if an error occurs while accessing resources.
 	 */
 	private void writeAsText( final Appendable out, final String indent, final Node node )
-		throws IOException
+	throws IOException
 	{
 		final boolean isTag = ( node.getLocalName() != null );
 
@@ -217,7 +217,7 @@ public class TestDomXmlWriter
 		final NamedNodeMap attributes = node.getAttributes();
 		if ( attributes != null )
 		{
-			for ( int i = 0 ; i < attributes.getLength(); i++ )
+			for ( int i = 0; i < attributes.getLength(); i++ )
 			{
 				final Node attribute = attributes.item( i );
 				out.append( ' ' );

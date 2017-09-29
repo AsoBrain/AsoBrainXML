@@ -21,10 +21,10 @@ package ab.xml;
 /**
  * Indicates that a factory instance could not be created.
  *
- * @author  G. Meinders
+ * @author G. Meinders
  */
 public class FactoryException
-	extends RuntimeException
+extends RuntimeException
 {
 	/** Serialized data version. */
 	private static final long serialVersionUID = 7574420257480434915L;
@@ -39,7 +39,7 @@ public class FactoryException
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param   message     Detail message.
+	 * @param message Detail message.
 	 */
 	public FactoryException( final String message )
 	{
@@ -49,8 +49,8 @@ public class FactoryException
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param   message     Detail message.
-	 * @param   cause       Cause of the exception.
+	 * @param message Detail message.
+	 * @param cause   Cause of the exception.
 	 */
 	public FactoryException( final String message, final Throwable cause )
 	{
@@ -60,7 +60,7 @@ public class FactoryException
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param   cause       Cause of the exception.
+	 * @param cause Cause of the exception.
 	 */
 	public FactoryException( final Throwable cause )
 	{

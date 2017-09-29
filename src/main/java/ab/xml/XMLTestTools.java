@@ -25,50 +25,57 @@ import java.util.regex.*;
 import javax.xml.stream.*;
 import javax.xml.stream.events.*;
 
-import junit.framework.*;
-
 import static junit.framework.Assert.*;
+import junit.framework.*;
 
 /**
  * Tools for testing XML-related code.
  *
  * <h3>Processing instructions</h3>
+ *
  * <p>When comparing XML documents, it may not be possible (or practical) for
- * the two XML documents to be identical. For example if the documents include
- * a timestamp. To overcome this, reference documents may be annotated using
+ * the two XML documents to be identical. For example if the documents include a
+ * timestamp. To overcome this, reference documents may be annotated using
  * processing instructions.
  *
- * <p>The syntax for the processing instructions
- * supported by this class is:
+ * <p>The syntax for the processing instructions supported by this class is:
  * <pre>&lt;?unit-test instruction [attribute="value" [...]] ?&gt;</pre>
  *
  * <p>For example:
  * <pre>&lt;?unit-test validate type="dateTime" ?&gt;</pre>
  *
  * <p>Available instructions and their attributes are listed in the table below.
- * The term 'content' refers to the text content at the current position in
- * the XML document. Attributes are required, unless specified otherwise.
+ * The term 'content' refers to the text content at the current position in the
+ * XML document. Attributes are required, unless specified otherwise.
+ *
  * <table>
- *   <tr><th>Instruction</th><th>Attribute</th><th>Description</th></tr>
- *   <tr><td>ignore</td><td></td><td>Ignores the content.</td></tr>
- *   <tr><td>validate</td><td></td><td>Ensures that the content is a valid lexical value for the specified XML Schema data type.</td></tr>
- *   <tr><td></td><td>type</td><td>XML Schema data type, e.g. <code>dateTime</code>.</td></tr>
+ *
+ * <tr><th>Instruction</th><th>Attribute</th><th>Description</th></tr>
+ *
+ * <tr><td>ignore</td><td></td><td>Ignores the content.</td></tr>
+ *
+ * <tr><td>validate</td><td></td><td>Ensures that the content is a valid lexical
+ * value for the specified XML Schema data type.</td></tr>
+ *
+ * <tr><td></td><td>type</td><td>XML Schema data type, e.g.
+ * <code>dateTime</code>.</td></tr>
+ *
  * </table>
  *
- * @author  G. Meinders
+ * @author G. Meinders
  */
 public class XMLTestTools
 {
 	/**
 	 * Asserts that the given stream contain an equivalent XML document.
 	 *
-	 * @param   expectedIn  Expected XML document.
-	 * @param   actualIn    Actual XML document.
+	 * @param expectedIn Expected XML document.
+	 * @param actualIn   Actual XML document.
 	 *
 	 * @throws XMLStreamException if there is an error with the underlying XML.
 	 */
 	public static void assertXMLEquals( final InputStream expectedIn, final InputStream actualIn )
-		throws XMLStreamException
+	throws XMLStreamException
 	{
 		assertXMLEquals( null, expectedIn, actualIn );
 	}
@@ -76,14 +83,14 @@ public class XMLTestTools
 	/**
 	 * Asserts that the given stream contain an equivalent XML document.
 	 *
-	 * @param   message     Assertion failure message.
-	 * @param   expectedIn  Expected XML document.
-	 * @param   actualIn    Actual XML document.
+	 * @param message    Assertion failure message.
+	 * @param expectedIn Expected XML document.
+	 * @param actualIn   Actual XML document.
 	 *
 	 * @throws XMLStreamException if there is an error with the underlying XML.
 	 */
 	public static void assertXMLEquals( final String message, final InputStream expectedIn, final InputStream actualIn )
-		throws XMLStreamException
+	throws XMLStreamException
 	{
 		final String messagePrefix = ( message != null ) && !message.isEmpty() ? message + " - " : "";
 
@@ -93,7 +100,7 @@ public class XMLTestTools
 		final XMLEventReader actualReader = xmlInputFactory.createXMLEventReader( actualIn );
 		final XMLEventReader expectedReader = xmlInputFactory.createXMLEventReader( expectedIn );
 
-		final Pattern processingInstructionPattern = Pattern.compile( "([A-Za-z_][A-Z-a-z0-9_-]*)(?:\\s+([A-Za-z_][A-Z-a-z0-9_-]*)=\"([^\"]*)\")\\s*" );
+		final Pattern processingInstructionPattern = Pattern.compile( "([A-Za-z_][A-Za-z0-9_-]*)(?:\\s+([A-Za-z_][A-Za-z0-9_-]*)=\"([^\"]*)\")\\s*" );
 
 		while ( expectedReader.hasNext() && actualReader.hasNext() )
 		{
@@ -116,7 +123,7 @@ public class XMLTestTools
 
 					final String instruction = matcher.group( 1 );
 
-					final Map<String,String> instructionAttributes = new HashMap<String, String>();
+					final Map<String, String> instructionAttributes = new HashMap<String, String>();
 					for ( int i = 2; i < matcher.groupCount(); i += 2 )
 					{
 						instructionAttributes.put( matcher.group( i ), matcher.group( i + 1 ) );
@@ -162,14 +169,14 @@ public class XMLTestTools
 	/**
 	 * Asserts that the given stream contain an equivalent XML document.
 	 *
-	 * @param   message     Assertion failure message.
-	 * @param   expected    Expected XML document.
-	 * @param   actual      Actual XML document.
+	 * @param message  Assertion failure message.
+	 * @param expected Expected XML document.
+	 * @param actual   Actual XML document.
 	 *
 	 * @throws XMLStreamException if there is an error with the underlying XML.
 	 */
 	public static void assertXMLEquals( final String message, final String expected, final String actual )
-		throws XMLStreamException
+	throws XMLStreamException
 	{
 		assertXMLEquals( message, new ByteArrayInputStream( expected.getBytes() ), new ByteArrayInputStream( actual.getBytes() ) );
 	}
@@ -182,9 +189,9 @@ public class XMLTestTools
 	 * resource. The class name is optional and may be used to specify which
 	 * class (loader) is used to find the resource.
 	 *
-	 * @param   messagePrefix           Prefix for assertion failure messages.
-	 * @param   event                   Current XML event being validated.
-	 * @param   instructionAttributes   Processing instruction attributes.
+	 * @param messagePrefix         Prefix for assertion failure messages.
+	 * @param event                 Current XML event being validated.
+	 * @param instructionAttributes Processing instruction attributes.
 	 */
 	private static void processingResourceUrl( final String messagePrefix, final XMLEvent event, final Map<String, String> instructionAttributes )
 	{
@@ -206,7 +213,7 @@ public class XMLTestTools
 				{
 					clazz = Class.forName( attributeValue );
 				}
-				catch ( ClassNotFoundException e )
+				catch ( final ClassNotFoundException ignored )
 				{
 					throw new AssertionError( "Class '" + attributeValue + "' not found for '<?unit-test resource-url ?> processing instruction" );
 				}
@@ -240,9 +247,9 @@ public class XMLTestTools
 	 * This ensures that the content is a valid lexical value for the specified
 	 * XML Schema data type (e.g. <code>dateTime</code>).
 	 *
-	 * @param   messagePrefix           Prefix for assertion failure messages.
-	 * @param   event                   Current XML event being validated.
-	 * @param   instructionAttributes   Processing instruction attributes.
+	 * @param messagePrefix         Prefix for assertion failure messages.
+	 * @param event                 Current XML event being validated.
+	 * @param instructionAttributes Processing instruction attributes.
 	 */
 	private static void processValidate( final String messagePrefix, final XMLEvent event, final Map<String, String> instructionAttributes )
 	{
@@ -281,7 +288,7 @@ public class XMLTestTools
 				throw new AssertionError( "Validation of data type '" + type + "' is not implemented." );
 			}
 		}
-		catch ( Exception e )
+		catch ( final Exception e )
 		{
 			final AssertionError error = new AssertionError( "Invalid value for data type '" + type + "': " + event );
 			error.initCause( e );

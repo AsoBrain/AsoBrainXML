@@ -24,17 +24,21 @@ package ab.xml;
  * @author G. Meinders
  */
 public class TestStaxReader
-	extends AbstractTestXMLReader
+extends AbstractTestXMLReader
 {
 	@Override
 	public void setUp()
+	throws Exception
 	{
+		super.setUp();
 		_factory = new StaxReaderFactory();
 	}
 
 	@Override
 	public void tearDown()
+	throws Exception
 	{
 		_factory = null;
+		super.tearDown();
 	}
 }

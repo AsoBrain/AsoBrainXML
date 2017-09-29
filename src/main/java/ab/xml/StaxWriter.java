@@ -26,10 +26,10 @@ import org.jetbrains.annotations.*;
 /**
  * XML writer implementation that uses StAX, the Streaming API for XML.
  *
- * @author  G. Meinders
+ * @author G. Meinders
  */
 public class StaxWriter
-	implements XMLWriter
+implements XMLWriter
 {
 	/**
 	 * StAX writer to be used.
@@ -42,20 +42,20 @@ public class StaxWriter
 	private final String _encoding;
 
 	/**
-	 * <code>true</code> if the writer is currently writing an empty tag.
+	 * {@code true} if the writer is currently writing an empty tag.
 	 */
 	private boolean _empty = false;
 
 	/**
 	 * Namespace declarations that need to be added to the next start element.
 	 */
-	private final List<NamespaceDeclaration> _namespaces = new ArrayList<NamespaceDeclaration>();
+	private final Collection<NamespaceDeclaration> _namespaces = new ArrayList<NamespaceDeclaration>();
 
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param   writer      StAX writer to be used.
-	 * @param   encoding    Character encoding of the XML document.
+	 * @param writer   StAX writer to be used.
+	 * @param encoding Character encoding of the XML document.
 	 */
 	public StaxWriter( final XMLStreamWriter writer, final String encoding )
 	{
@@ -63,35 +63,38 @@ public class StaxWriter
 		_encoding = encoding;
 	}
 
+	@Override
 	public void startDocument()
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
 			_writer.writeStartDocument( _encoding, "1.0" );
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void setPrefix( @NotNull final String prefix, @NotNull final String namespaceURI )
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
 			_writer.setPrefix( prefix, namespaceURI );
 			_namespaces.add( new NamespaceDeclaration( prefix, namespaceURI ) );
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void startTag( final String namespaceURI, @NotNull final String localName )
-		throws XMLException
+	throws XMLException
 	{
 		if ( _empty )
 		{
@@ -114,14 +117,15 @@ public class StaxWriter
 			}
 			_namespaces.clear();
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void emptyTag( final String namespaceURI, @NotNull final String localName )
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
@@ -134,15 +138,16 @@ public class StaxWriter
 				_writer.writeEmptyElement( namespaceURI, localName );
 			}
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 		_empty = true;
 	}
 
+	@Override
 	public void attribute( final String namespaceURI, @NotNull final String localName, @NotNull final String value )
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
@@ -155,14 +160,15 @@ public class StaxWriter
 				_writer.writeAttribute( namespaceURI, localName, value );
 			}
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void text( @NotNull final String characters )
-		throws XMLException
+	throws XMLException
 	{
 		if ( _empty )
 		{
@@ -173,14 +179,15 @@ public class StaxWriter
 		{
 			_writer.writeCharacters( characters );
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void endTag( final String namespaceURI, @NotNull final String localName )
-		throws XMLException
+	throws XMLException
 	{
 		if ( _empty )
 		{
@@ -192,34 +199,36 @@ public class StaxWriter
 			{
 				_writer.writeEndElement();
 			}
-			catch ( XMLStreamException e )
+			catch ( final XMLStreamException e )
 			{
 				throw new XMLException( e );
 			}
 		}
 	}
 
+	@Override
 	public void endDocument()
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
 			_writer.writeEndDocument();
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
+	@Override
 	public void flush()
-		throws XMLException
+	throws XMLException
 	{
 		try
 		{
 			_writer.flush();
 		}
-		catch ( XMLStreamException e )
+		catch ( final XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
@@ -243,8 +252,8 @@ public class StaxWriter
 		/**
 		 * Constructs a new instance.
 		 *
-		 * @param   prefix          Prefix.
-		 * @param   namespaceURI    Namespace URI.
+		 * @param prefix       Prefix.
+		 * @param namespaceURI Namespace URI.
 		 */
 		private NamespaceDeclaration( final String prefix, final String namespaceURI )
 		{

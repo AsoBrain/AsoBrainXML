@@ -26,15 +26,15 @@ import org.xmlpull.v1.*;
 /**
  * Factory for XML readers that use XML Pull.
  *
- * @author  G. Meinders
+ * @author G. Meinders
  */
 class XmlPullReaderFactory
-	extends XMLReaderFactory
+extends XMLReaderFactory
 {
 	/**
 	 * Factory used to create XML Pull readers.
 	 */
-	private XmlPullParserFactory _factory;
+	private final XmlPullParserFactory _factory;
 
 	/**
 	 * Constructs a new instance.
@@ -47,7 +47,7 @@ class XmlPullReaderFactory
 			factory.setNamespaceAware( true );
 			_factory = factory;
 		}
-		catch ( XmlPullParserException e )
+		catch ( final XmlPullParserException e )
 		{
 			throw new FactoryException( e );
 		}
@@ -55,7 +55,7 @@ class XmlPullReaderFactory
 
 	@Override
 	public XMLReader createXMLReader( @NotNull final InputStream in, final String encoding )
-		throws XMLException
+	throws XMLException
 	{
 		final XmlPullParser parser;
 		try
@@ -63,7 +63,7 @@ class XmlPullReaderFactory
 			parser = _factory.newPullParser();
 			parser.setInput( in, encoding );
 		}
-		catch ( XmlPullParserException e )
+		catch ( final XmlPullParserException e )
 		{
 			throw new XMLException( e );
 		}

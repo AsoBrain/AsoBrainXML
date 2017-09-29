@@ -21,10 +21,10 @@ package ab.xml;
 /**
  * Indicates that an XML-related operation cannot be completed.
  *
- * @author  G. Meinders
+ * @author G. Meinders
  */
 public class XMLException
-	extends Exception
+extends Exception
 {
 	/** Serialized data version. */
 	private static final long serialVersionUID = 2576150199808703846L;
@@ -39,7 +39,7 @@ public class XMLException
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param   message     Detail message.
+	 * @param message Detail message.
 	 */
 	public XMLException( final String message )
 	{
@@ -49,8 +49,8 @@ public class XMLException
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param   message     Detail message.
-	 * @param   cause       Cause of the exception.
+	 * @param message Detail message.
+	 * @param cause   Cause of the exception.
 	 */
 	public XMLException( final String message, final Throwable cause )
 	{
@@ -60,7 +60,7 @@ public class XMLException
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param   cause       Cause of the exception.
+	 * @param cause Cause of the exception.
 	 */
 	public XMLException( final Throwable cause )
 	{

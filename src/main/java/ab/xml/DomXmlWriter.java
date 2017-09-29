@@ -31,10 +31,10 @@ import org.w3c.dom.*;
  * @author  Peter S. Heijnen
  */
 public class DomXmlWriter
-	implements XMLWriter
+implements XMLWriter
 {
 	/**
-	 * XML document.
+	 * Written XML document.
 	 */
 	private Document _document;
 
@@ -44,14 +44,14 @@ public class DomXmlWriter
 	private Node _node;
 
 	/**
-	 * <code>true</code> if the writer is currently writing an empty tag.
+	 * {@code true} if the writer is currently writing an empty tag.
 	 */
 	private boolean _empty = false;
 
 	/**
 	 * Namespace declarations that need to be added to the next start element.
 	 */
-	private final LinkedList<Map<String,String>> _nsPrefixStack;
+	private final Deque<Map<String, String>> _nsPrefixStack;
 
 	/**
 	 * Construct writer for a new document. Use {@link #startDocument()} to
@@ -63,34 +63,30 @@ public class DomXmlWriter
 	}
 
 	/**
-	 * Construct writer for an existing document. The writer starts at the
-	 * given node.
+	 * Construct writer for an existing document. The writer starts at the given
+	 * node.
 	 *
-	 * @param   document    Document being written.
-	 * @param   node        Node to start at.
+	 * @param document Document being written.
+	 * @param node     Node to start at.
 	 */
 	public DomXmlWriter( final Document document, final Node node )
 	{
 		_document = document;
 		_node = node;
 
-		final LinkedList<Map<String, String>> nsPrefixStack = new LinkedList<Map<String, String>>();
+		final Deque<Map<String, String>> nsPrefixStack = new LinkedList<Map<String, String>>();
 		nsPrefixStack.add( new LinkedHashMap<String, String>() );
 		_nsPrefixStack = nsPrefixStack;
 	}
 
-	/**
-	 * Get written document.
-	 *
-	 * @return  Document.
-	 */
 	public Document getDocument()
 	{
 		return _document;
 	}
 
+	@Override
 	public void startDocument()
-		throws XMLException
+	throws XMLException
 	{
 		if ( _document != null )
 		{
@@ -105,7 +101,7 @@ public class DomXmlWriter
 		{
 			db = dbf.newDocumentBuilder();
 		}
-		catch ( ParserConfigurationException e )
+		catch ( final ParserConfigurationException e )
 		{
 			throw new XMLException( e );
 		}
@@ -115,15 +111,17 @@ public class DomXmlWriter
 		_node = document;
 	}
 
+	@Override
 	public void setPrefix( @NotNull final String prefix, @NotNull final String namespaceURI )
-		throws XMLException
+	throws XMLException
 	{
 		final Map<String, String> nsPrefixes = _nsPrefixStack.getLast();
 		nsPrefixes.put( namespaceURI, prefix );
 	}
 
+	@Override
 	public void startTag( final String namespaceURI, @NotNull final String localName )
-		throws XMLException
+	throws XMLException
 	{
 		if ( _empty )
 		{
@@ -163,15 +161,17 @@ public class DomXmlWriter
 		_node = element;
 	}
 
+	@Override
 	public void emptyTag( final String namespaceURI, @NotNull final String localName )
-		throws XMLException
+	throws XMLException
 	{
 		startTag( namespaceURI, localName );
 		_empty = true;
 	}
 
+	@Override
 	public void attribute( final String namespaceURI, @NotNull final String localName, @NotNull final String value )
-		throws XMLException
+	throws XMLException
 	{
 		final Node node = _node;
 
@@ -180,7 +180,7 @@ public class DomXmlWriter
 			throw new XMLException( "Must start tag before setting attributes" );
 		}
 
-		final Element element = (Element) node;
+		final Element element = (Element)node;
 
 		if ( namespaceURI == null )
 		{
@@ -192,8 +192,9 @@ public class DomXmlWriter
 		}
 	}
 
+	@Override
 	public void text( @NotNull final String characters )
-		throws XMLException
+	throws XMLException
 	{
 		if ( _empty )
 		{
@@ -211,7 +212,7 @@ public class DomXmlWriter
 		final Node lastChild = node.getLastChild();
 		if ( lastChild instanceof Text )
 		{
-			final Text text = (Text) lastChild;
+			final Text text = (Text)lastChild;
 			text.appendData( characters );
 		}
 		else
@@ -220,8 +221,9 @@ public class DomXmlWriter
 		}
 	}
 
+	@Override
 	public void endTag( final String namespaceURI, @NotNull final String localName )
-		throws XMLException
+	throws XMLException
 	{
 		_empty = false;
 
@@ -239,8 +241,9 @@ public class DomXmlWriter
 		_node = node.getParentNode();
 	}
 
+	@Override
 	public void endDocument()
-		throws XMLException
+	throws XMLException
 	{
 		final Document document = _document;
 		final Node node = _node;
@@ -250,31 +253,33 @@ public class DomXmlWriter
 			throw new XMLException( "Can't end document before the document is started" );
 		}
 
+		//noinspection ObjectEquality
 		if ( _node != _document )
 		{
 			throw new XMLException( "Can't end document before the document is started" );
 		}
 	}
 
+	@Override
 	public void flush()
-		throws XMLException
+	throws XMLException
 	{
 	}
 
 	/**
 	 * Get qualified name for a given name space and locale name.
 	 *
-	 * @param   namespaceURI    Namespace URI of node/attribute.
-	 * @param   localName       Local name of the node/attribute.
+	 * @param namespaceURI Namespace URI of node/attribute.
+	 * @param localName    Local name of the node/attribute.
 	 *
-	 * @return  Qualified name based on namespace URI and known prefixes;
-	 *          <code>localName</code> if name could no be qualified.
+	 * @return Qualified name based on namespace URI and known prefixes; {@code
+	 * localName} if name could no be qualified.
 	 */
 	private String getQualifiedName( final String namespaceURI, final String localName )
 	{
 		String result = localName;
 
-		for( final Iterator<Map<String, String>> it = _nsPrefixStack.descendingIterator(); it.hasNext(); )
+		for ( final Iterator<Map<String, String>> it = _nsPrefixStack.descendingIterator(); it.hasNext(); )
 		{
 			final Map<String, String> nsPrefixes = it.next();
 			final String prefix = nsPrefixes.get( namespaceURI );
