@@ -22,6 +22,7 @@ import java.io.*;
 import java.util.*;
 import javax.xml.namespace.*;
 
+import org.jetbrains.annotations.*;
 import org.xmlpull.v1.*;
 
 /**
@@ -38,6 +39,7 @@ implements XmlSerializer
 	/**
 	 * Underlying writer.
 	 */
+	@NotNull
 	private final XmlSerializer _writer;
 
 	/**
@@ -48,12 +50,14 @@ implements XmlSerializer
 	/**
 	 * String inserted as a newline. The default is <code>"\n"</code>.
 	 */
+	@NotNull
 	private String _newline = "\n";
 
 	/**
 	 * String inserted for each level of indenting. The default is
 	 * <code>"\t"</code>.
 	 */
+	@NotNull
 	private String _indent = "\t";
 
 	/**
@@ -74,27 +78,31 @@ implements XmlSerializer
 	 *
 	 * @param writer Underlying writer.
 	 */
-	public IndentingXmlSerializer( final XmlSerializer writer )
+	public IndentingXmlSerializer( @NotNull final XmlSerializer writer )
 	{
 		_writer = writer;
 	}
 
+	@SuppressWarnings( "WeakerAccess" )
+	@NotNull
 	public String getNewline()
 	{
 		return _newline;
 	}
 
-	public void setNewline( final String newline )
+	public void setNewline( @NotNull final String newline )
 	{
 		_newline = newline;
 	}
 
+	@SuppressWarnings( "WeakerAccess" )
+	@NotNull
 	public String getIndent()
 	{
 		return _indent;
 	}
 
-	public void setIndent( final String indent )
+	public void setIndent( @NotNull final String indent )
 	{
 		_indent = indent;
 	}
@@ -118,24 +126,6 @@ implements XmlSerializer
 	}
 
 	/**
-	 * Starts a new line with the proper amount of indenting, but does not
-	 * change the nesting depth. This is used for empty tags.
-	 *
-	 * @throws IOException if an I/O error occurs.
-	 */
-	private void indentSame()
-	throws IOException
-	{
-		_writer.text( getNewline() );
-		final int depth = _depth;
-		for ( int i = 0; i < depth; i++ )
-		{
-			_writer.text( getIndent() );
-		}
-		_simpleType = false;
-	}
-
-	/**
 	 * Decreases the nesting depth, and starts a new line with the proper amount
 	 * of indenting (except for a {@link #_simpleType}).
 	 *
@@ -156,6 +146,7 @@ implements XmlSerializer
 		_simpleType = false;
 	}
 
+	@NotNull
 	@Override
 	public XmlSerializer startTag( final String namespace, final String name )
 	throws IOException
@@ -170,6 +161,7 @@ implements XmlSerializer
 		return this;
 	}
 
+	@NotNull
 	@Override
 	public XmlSerializer endTag( final String namespace, final String name )
 	throws IOException
@@ -193,6 +185,7 @@ implements XmlSerializer
 		_writer.flush();
 	}
 
+	@NotNull
 	@Override
 	public XmlSerializer attribute( final String namespace, final String name, final String value )
 	throws IOException
@@ -214,46 +207,48 @@ implements XmlSerializer
 	}
 
 	@Override
-	public void setProperty( final String name, final Object value )
+	public void setProperty( @NotNull final String name, @Nullable final Object value )
 	{
 		_writer.setProperty( name, value );
 	}
 
+	@Nullable
 	@Override
-	public Object getProperty( final String name )
+	public Object getProperty( @NotNull final String name )
 	{
 		return _writer.getProperty( name );
 	}
 
 	@Override
-	public void setOutput( final OutputStream os, final String encoding )
+	public void setOutput( @NotNull final OutputStream os, @Nullable final String encoding )
 	throws IOException
 	{
 		_writer.setOutput( os, encoding );
 	}
 
 	@Override
-	public void setOutput( final Writer writer )
+	public void setOutput( @NotNull final Writer writer )
 	throws IOException
 	{
 		_writer.setOutput( writer );
 	}
 
 	@Override
-	public void startDocument( final String encoding, final Boolean standalone )
+	public void startDocument( @Nullable final String encoding, @Nullable final Boolean standalone )
 	throws IOException
 	{
 		_writer.startDocument( encoding, standalone );
 	}
 
 	@Override
-	public void setPrefix( final String prefix, final String namespace )
+	public void setPrefix( @NotNull final String prefix, @NotNull final String namespace )
 	{
 		_setPrefix.add( new QName( namespace, "", prefix ) );
 	}
 
+	@Contract( "_, true -> !null; _, false -> _" )
 	@Override
-	public String getPrefix( final String namespace, final boolean generatePrefix )
+	public String getPrefix( @NotNull final String namespace, final boolean generatePrefix )
 	{
 		String result = null;
 		for ( final QName entry : _setPrefix )
@@ -276,69 +271,73 @@ implements XmlSerializer
 		return _writer.getDepth();
 	}
 
+	@Nullable
 	@Override
 	public String getNamespace()
 	{
 		return _writer.getNamespace();
 	}
 
+	@Nullable
 	@Override
 	public String getName()
 	{
 		return _writer.getName();
 	}
 
+	@NotNull
 	@Override
-	public XmlSerializer text( final String text )
+	public XmlSerializer text( @NotNull final String text )
 	throws IOException
 	{
 		return _writer.text( text );
 	}
 
+	@NotNull
 	@Override
-	public XmlSerializer text( final char[] buf, final int start, final int len )
+	public XmlSerializer text( @NotNull final char[] buf, final int start, final int len )
 	throws IOException
 	{
 		return _writer.text( buf, start, len );
 	}
 
 	@Override
-	public void cdsect( final String text )
+	public void cdsect( @NotNull final String text )
 	throws IOException
 	{
 		_writer.cdsect( text );
 	}
 
 	@Override
-	public void entityRef( final String text )
+	public void entityRef( @NotNull final String text )
 	throws IOException
 	{
 		_writer.entityRef( text );
 	}
 
 	@Override
-	public void processingInstruction( final String text )
+	public void processingInstruction( @NotNull final String text )
 	throws IOException
 	{
 		_writer.processingInstruction( text );
 	}
 
 	@Override
-	public void comment( final String text )
+	public void comment( @NotNull final String text )
 	throws IOException
 	{
 		_writer.comment( text );
 	}
 
 	@Override
-	public void docdecl( final String text )
+	public void docdecl( @NotNull final String text )
 	throws IOException
 	{
 		_writer.docdecl( text );
 	}
 
 	@Override
-	public void ignorableWhitespace( final String text )
+	public void ignorableWhitespace( @NotNull final String text )
 	throws IOException
 	{
 		_writer.ignorableWhitespace( text );
