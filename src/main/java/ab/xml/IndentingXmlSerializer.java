@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2019 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,8 @@
 package ab.xml;
 
 import java.io.*;
+import java.util.*;
+import javax.xml.namespace.*;
 
 import org.xmlpull.v1.*;
 
@@ -59,6 +61,13 @@ implements XmlSerializer
 	 * 'xsd:simpleType').
 	 */
 	private boolean _simpleType = true;
+
+	/**
+	 * List of prefixes to set. For compatibility with the xpp3 implementation
+	 * of {@link XmlSerializer}, prefixes have to be set immediately before
+	 * {@link XmlSerializer#startTag} (i.e. after indentation).
+	 */
+	private final List<QName> _setPrefix = new ArrayList<QName>();
 
 	/**
 	 * Constructs a new indenting writer.
@@ -152,6 +161,11 @@ implements XmlSerializer
 	throws IOException
 	{
 		indentIn();
+		for ( final QName entry : _setPrefix )
+		{
+			_writer.setPrefix( entry.getPrefix(), entry.getNamespaceURI() );
+		}
+		_setPrefix.clear();
 		_writer.startTag( namespace, name );
 		return this;
 	}
@@ -234,15 +248,26 @@ implements XmlSerializer
 
 	@Override
 	public void setPrefix( final String prefix, final String namespace )
-	throws IOException
 	{
-		_writer.setPrefix( prefix, namespace );
+		_setPrefix.add( new QName( namespace, "", prefix ) );
 	}
 
 	@Override
 	public String getPrefix( final String namespace, final boolean generatePrefix )
 	{
-		return _writer.getPrefix( namespace, generatePrefix );
+		String result = null;
+		for ( final QName entry : _setPrefix )
+		{
+			if ( namespace.equals( entry.getNamespaceURI() ) )
+			{
+				result = entry.getPrefix();
+			}
+		}
+		if ( result == null )
+		{
+			result = _writer.getPrefix( namespace, generatePrefix );
+		}
+		return result;
 	}
 
 	@Override

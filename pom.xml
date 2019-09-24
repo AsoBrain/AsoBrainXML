@@ -23,11 +23,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>net.sf.kxml</groupId>
-			<artifactId>kxml2</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
 			<version>13.0</version>
@@ -39,6 +34,32 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>kxml2</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>net.sf.kxml</groupId>
+					<artifactId>kxml2</artifactId>
+					<version>2.3.0</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>xpp3</id>
+			<dependencies>
+				<dependency>
+					<groupId>xpp3</groupId>
+					<artifactId>xpp3</artifactId>
+					<version>1.1.4c</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 
 	<build>
 		<defaultGoal>install</defaultGoal>
