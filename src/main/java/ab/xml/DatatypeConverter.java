@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2013 Peter S. Heijnen
+ * Copyright (C) 1999-2021 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -104,7 +104,79 @@ public class DatatypeConverter
 	}
 
 	/**
-	 * Converts the given data-time value to a {@link BigDecimal} instance. The
+	 * Converts the given floating point value to a {@link float}. The given
+	 * value must be a valid lexical value of the XML Schema {@code float}
+	 * data type.
+	 *
+	 * @param value Value to be parsed.
+	 *
+	 * @return Parsed value.
+	 *
+	 * @throws NumberFormatException {@code value} is not properly formatted.
+	 */
+	public static float parseFloat( final String value )
+	{
+		final float result;
+
+		final String trimmed = value.trim();
+		if ( "INF".equals( trimmed ) )
+		{
+			result = Float.POSITIVE_INFINITY;
+		}
+		else if ( "-INF".equals( trimmed ) )
+		{
+			result = Float.NEGATIVE_INFINITY;
+		}
+		else if ( "NaN".equals( trimmed ) )
+		{
+			result = Float.NaN;
+		}
+		else
+		{
+			result = Float.parseFloat( trimmed );
+		}
+
+		return result;
+	}
+
+	/**
+	 * Converts the given floating point value to a {@link double}. The given
+	 * value must be a valid lexical value of the XML Schema {@code double}
+	 * data type.
+	 *
+	 * @param value Value to be parsed.
+	 *
+	 * @return Parsed value.
+	 *
+	 * @throws NumberFormatException {@code value} is not properly formatted.
+	 */
+	public static double parseDouble( final String value )
+	{
+		final double result;
+
+		final String trimmed = value.trim();
+		if ( "INF".equals( trimmed ) )
+		{
+			result = Double.POSITIVE_INFINITY;
+		}
+		else if ( "-INF".equals( trimmed ) )
+		{
+			result = Double.NEGATIVE_INFINITY;
+		}
+		else if ( "NaN".equals( trimmed ) )
+		{
+			result = Double.NaN;
+		}
+		else
+		{
+			result = Double.parseDouble( trimmed );
+		}
+
+		return result;
+	}
+
+	/**
+	 * Converts the given decimal value to a {@link BigDecimal} instance. The
 	 * given value must be a valid lexical value of the XML Schema {@code
 	 * decimal} data type.
 	 *
