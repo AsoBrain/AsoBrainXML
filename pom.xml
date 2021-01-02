@@ -83,7 +83,7 @@
 				<configuration>
 					<toolchains>
 						<jdk>
-							<version>1.6</version>
+							<version>1.8</version>
 						</jdk>
 					</toolchains>
 				</configuration>
@@ -115,8 +115,8 @@
 	</reporting>
 
 	<properties>
-		<maven.compiler.source>1.6</maven.compiler.source>
-		<maven.compiler.target>1.6</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 </project>
