@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2015 Peter S. Heijnen
+ * Copyright (C) 1999-2022 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.*;
  * <p>Comments and declarations are ignored. All character data is treated
  * equally. Processing instructions are supported.
  *
- * @author G. Meinders
+ * @author Gerrit Meinders
  */
 public interface XMLReader
 {
@@ -199,4 +199,18 @@ public interface XMLReader
 	 */
 	@NotNull
 	String getPIData();
+
+	/**
+	 * Returns the line number for the current event.
+	 *
+	 * @return Line number; {@code -1} if unknown.
+	 */
+	int getLineNumber();
+
+	/**
+	 * Returns the column number for the current event.
+	 *
+	 * @return Column number; {@code -1} if unknown.
+	 */
+	int getColumnNumber();
 }

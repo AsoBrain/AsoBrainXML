@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2022 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,12 +22,13 @@ import java.io.*;
 import javax.xml.parsers.*;
 
 import junit.framework.*;
+import org.junit.Test;
 import org.w3c.dom.*;
 
 /**
  * Test for the {@link DomXmlWriter} class.
  *
- * @author G. Meinders
+ * @author Gerrit Meinders
  */
 public class TestDomXmlWriter
 extends TestCase
@@ -38,6 +39,7 @@ extends TestCase
 	 *
 	 * @throws Exception if the test fails.
 	 */
+	@Test
 	public void testDocument1()
 	throws Exception
 	{

@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2012 Peter S. Heijnen
+ * Copyright (C) 1999-2022 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,22 +19,30 @@
 package ab.xml;
 
 import java.io.*;
+import java.util.*;
 
-import junit.framework.*;
 import org.jetbrains.annotations.*;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 /**
  * Provides common unit tests for {@link XMLReader} classes.
  *
- * @author G. Meinders
+ * @author Gerrit Meinders
  */
-public abstract class AbstractTestXMLReader
-extends TestCase
+@SuppressWarnings( { "AbstractClassWithoutAbstractMethods", "UseOfSystemOutOrSystemErr" } )
+public abstract class XMLReaderTestCase
 {
 	/**
 	 * Factory that creates the {@code XMLReader}s to be tested.
 	 */
 	protected XMLReaderFactory _factory = null;
+
+	@After
+	public void tearDown()
+	{
+		_factory = null;
+	}
 
 	/**
 	 * Tests that the reader returns all the appropriate events for the input
@@ -43,24 +51,28 @@ extends TestCase
 	 *
 	 * @throws Exception if the test fails.
 	 */
+	@Test
 	public void testDocument1()
 	throws Exception
 	{
-		System.out.println( getClass().getName() + ".testDocument1()" );
-		final XMLReader reader = _factory.createXMLReader( AbstractTestXMLReader.class.getResourceAsStream( "TestXMLReader-1.xml" ), null );
+		final XMLReader reader = _factory.createXMLReader( Objects.requireNonNull( XMLReaderTestCase.class.getResourceAsStream( "TestXMLReader-1.xml" ) ), null );
 
 		assertEquals( "Unexpected event type.", XMLEventType.PROCESSING_INSTRUCTION, ignoreWhiteSpace( reader ) );
 		assertEquals( "Unexpected processing instruction target.", "magic", reader.getPITarget() );
 		assertEquals( "Unexpected processing instruction data.", "processing instruction 1", reader.getPIData() );
+		assertEquals( "Unexpected line number", 2, reader.getLineNumber() );
+		assertEquals( "Unexpected column number", 35, reader.getColumnNumber() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.PROCESSING_INSTRUCTION, ignoreWhiteSpace( reader ) );
 		assertEquals( "Unexpected processing instruction target.", "magic", reader.getPITarget() );
 		assertEquals( "Unexpected processing instruction data.", "", reader.getPIData() );
+		assertEquals( "Unexpected line number", 3, reader.getLineNumber() );
+		assertEquals( "Unexpected column number", 10, reader.getColumnNumber() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.DTD, ignoreWhiteSpace( reader ) );
 
 		assertEquals( "Unexpected event type.", XMLEventType.START_ELEMENT, ignoreWhiteSpace( reader ) );
-		assertEquals( "Unexpected namespace URI.", null, reader.getNamespaceURI() );
+		assertNull( "Unexpected namespace URI.", reader.getNamespaceURI() );
 		assertEquals( "Unexpected local name.", "example", reader.getLocalName() );
 		assertEquals( "Unexpected attribute count.", 0, reader.getAttributeCount() );
 
@@ -75,7 +87,7 @@ extends TestCase
 		assertEquals( "Unexpected local name for attribute 0.", "attribute1", reader.getAttributeLocalName( 0 ) );
 		assertEquals( "Unexpected value for attribute 0.", "value1", reader.getAttributeValue( 0 ) );
 		assertEquals( "Unexpected value for attribute 0.", "value1", reader.getAttributeValue( "http://www.example.com/ns1", "attribute1" ) );
-		assertEquals( "Unexpected namespace URI for attribute 1.", null, reader.getAttributeNamespaceURI( 1 ) );
+		assertNull( "Unexpected namespace URI for attribute 1.", reader.getAttributeNamespaceURI( 1 ) );
 		assertEquals( "Unexpected local name for attribute 1.", "attribute2", reader.getAttributeLocalName( 1 ) );
 		assertEquals( "Unexpected value for attribute 1.", "value2", reader.getAttributeValue( 1 ) );
 		assertEquals( "Unexpected value for attribute 1.", "value2", reader.getAttributeValue( null, "attribute2" ) );
@@ -87,10 +99,12 @@ extends TestCase
 		assertEquals( "Unexpected namespace URI.", "http://www.example.com/default", reader.getNamespaceURI() );
 		assertEquals( "Unexpected local name.", "element2", reader.getLocalName() );
 		assertEquals( "Unexpected attribute count.", 1, reader.getAttributeCount() );
-		assertEquals( "Unexpected namespace URI for attribute 0.", null, reader.getAttributeNamespaceURI( 0 ) );
+		assertNull( "Unexpected namespace URI for attribute 0.", reader.getAttributeNamespaceURI( 0 ) );
 		assertEquals( "Unexpected local name for attribute 0.", "attribute3", reader.getAttributeLocalName( 0 ) );
 		assertEquals( "Unexpected value for attribute 0.", "value3", reader.getAttributeValue( 0 ) );
 		assertEquals( "Unexpected value for attribute 0.", "value3", reader.getAttributeValue( null, "attribute3" ) );
+		assertEquals( "Unexpected line number", 11, reader.getLineNumber() );
+		assertEquals( "Unexpected column number", 35, reader.getColumnNumber() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_ELEMENT, reader.next() );
 		assertEquals( "Unexpected namespace URI.", "http://www.example.com/default", reader.getNamespaceURI() );
@@ -110,7 +124,7 @@ extends TestCase
 		assertEquals( "Unexpected local name for attribute 0.", "attribute4", reader.getAttributeLocalName( 0 ) );
 		assertEquals( "Unexpected value for attribute 0.", "value4", reader.getAttributeValue( 0 ) );
 		assertEquals( "Unexpected value for attribute 0.", "value4", reader.getAttributeValue( "http://www.example.com/ns2", "attribute4" ) );
-		assertEquals( "Unexpected namespace URI for attribute 1.", null, reader.getAttributeNamespaceURI( 1 ) );
+		assertNull( "Unexpected namespace URI for attribute 1.", reader.getAttributeNamespaceURI( 1 ) );
 		assertEquals( "Unexpected local name for attribute 1.", "attribute5", reader.getAttributeLocalName( 1 ) );
 		assertEquals( "Unexpected value for attribute 1.", "ns2:value5", reader.getAttributeValue( 1 ) );
 		assertEquals( "Unexpected value for attribute 1.", "ns2:value5", reader.getAttributeValue( null, "attribute5" ) );
@@ -152,7 +166,7 @@ extends TestCase
 		assertEquals( "Unexpected namespace URI.", "http://www.example.com/ns2", reader.getNamespaceURI() );
 		assertEquals( "Unexpected local name.", "element5", reader.getLocalName() );
 		assertEquals( "Unexpected attribute count.", 2, reader.getAttributeCount() );
-		assertEquals( "Unexpected namespace URI for attribute 0.", null, reader.getAttributeNamespaceURI( 0 ) );
+		assertNull( "Unexpected namespace URI for attribute 0.", reader.getAttributeNamespaceURI( 0 ) );
 		assertEquals( "Unexpected local name for attribute 0.", "attribute6", reader.getAttributeLocalName( 0 ) );
 		assertEquals( "Unexpected value for attribute 0.", "value6", reader.getAttributeValue( 0 ) );
 		assertEquals( "Unexpected value for attribute 0.", "value6", reader.getAttributeValue( null, "attribute6" ) );
@@ -169,7 +183,7 @@ extends TestCase
 		assertEquals( "Unexpected character data.", "", reader.getText().trim() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_ELEMENT, reader.next() );
-		assertEquals( "Unexpected namespace URI.", null, reader.getNamespaceURI() );
+		assertNull( "Unexpected namespace URI.", reader.getNamespaceURI() );
 		assertEquals( "Unexpected local name.", "example", reader.getLocalName() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_DOCUMENT, ignoreWhiteSpace( reader ) );
@@ -183,11 +197,11 @@ extends TestCase
 	 *
 	 * @throws XMLException if the test fails.
 	 */
+	@Test
 	public void testDocument2()
 	throws XMLException
 	{
-		System.out.println( getClass().getName() + ".testDocument2()" );
-		final XMLReader reader = _factory.createXMLReader( TestStaxReader.class.getResourceAsStream( "TestXMLReader-2.xml" ), null );
+		final XMLReader reader = _factory.createXMLReader( Objects.requireNonNull( TestStaxReader.class.getResourceAsStream( "TestXMLReader-2.xml" ) ), null );
 
 		assertEquals( "Unexpected event type.", XMLEventType.START_ELEMENT, ignoreWhiteSpace( reader ) );
 		assertEquals( "Unexpected namespace URI.", "http://www.w3.org/1999/xhtml", reader.getNamespaceURI() );
@@ -383,11 +397,10 @@ extends TestCase
 	 *
 	 * @throws XMLException if the test fails.
 	 */
+	@Test
 	public void testExceptionHandling()
 	throws XMLException
 	{
-		System.out.println( getClass().getName() + ".testExceptionHandling()" );
-
 		final XMLReader reader = createReaderForContent( "<?xml version='1.0'?><!DOCTYPE root><root>characters<?pi?></root>" );
 
 		assertEquals( "Unexpected event type.", XMLEventType.START_DOCUMENT, reader.getEventType() );
@@ -515,7 +528,7 @@ extends TestCase
 		{ /* Success! */ }
 
 		assertEquals( "Unexpected event type.", XMLEventType.START_ELEMENT, reader.next() );
-		assertEquals( "Unexpected namespace URI.", null, reader.getNamespaceURI() );
+		assertNull( "Unexpected namespace URI.", reader.getNamespaceURI() );
 		assertEquals( "Unexpected local name.", "root", reader.getLocalName() );
 		assertEquals( "Unexpected attribute count.", 0, reader.getAttributeCount() );
 		try
@@ -666,7 +679,7 @@ extends TestCase
 		assertEquals( "Unexpected processing instruction data.", "", reader.getPIData() );
 
 		assertEquals( "Unexpected event type.", XMLEventType.END_ELEMENT, reader.next() );
-		assertEquals( "Unexpected namespace URI.", null, reader.getNamespaceURI() );
+		assertNull( "Unexpected namespace URI.", reader.getNamespaceURI() );
 		assertEquals( "Unexpected local name.", "root", reader.getLocalName() );
 		try
 		{

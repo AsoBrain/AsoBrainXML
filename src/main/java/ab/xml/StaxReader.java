@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2022 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.*;
 /**
  * XML reader implementation that uses StAX, the Streaming API for XML.
  *
- * @author G. Meinders
+ * @author Gerrit Meinders
  */
 class StaxReader
 implements XMLReader
@@ -329,5 +329,17 @@ implements XMLReader
 		}
 
 		return _reader.getPIData();
+	}
+
+	@Override
+	public int getLineNumber()
+	{
+		return _reader.getLocation().getLineNumber();
+	}
+
+	@Override
+	public int getColumnNumber()
+	{
+		return _reader.getLocation().getColumnNumber();
 	}
 }

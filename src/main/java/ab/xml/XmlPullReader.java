@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2022 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import org.xmlpull.v1.*;
 /**
  * XML reader implementation that uses XML Pull.
  *
- * @author G. Meinders
+ * @author Gerrit Meinders
  */
 class XmlPullReader
 implements XMLReader
@@ -444,5 +444,17 @@ implements XMLReader
 
 		// noinspection ConstantConditions
 		return _piData;
+	}
+
+	@Override
+	public int getLineNumber()
+	{
+		return _parser.getLineNumber();
+	}
+
+	@Override
+	public int getColumnNumber()
+	{
+		return _parser.getColumnNumber();
 	}
 }

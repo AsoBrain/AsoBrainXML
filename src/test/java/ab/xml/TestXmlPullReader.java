@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2022 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,27 +18,19 @@
  */
 package ab.xml;
 
+import org.junit.*;
+
 /**
  * Unit test for {@link XmlPullReader}.
  *
- * @author G. Meinders
+ * @author Gerrit Meinders
  */
 public class TestXmlPullReader
-extends AbstractTestXMLReader
+extends XMLReaderTestCase
 {
-	@Override
+	@Before
 	public void setUp()
-	throws Exception
 	{
-		super.setUp();
 		_factory = new XmlPullReaderFactory();
-	}
-
-	@Override
-	public void tearDown()
-	throws Exception
-	{
-		_factory = null;
-		super.tearDown();
 	}
 }
