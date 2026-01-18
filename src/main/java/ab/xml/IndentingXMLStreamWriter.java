@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,8 @@ package ab.xml;
 import javax.xml.namespace.*;
 import javax.xml.stream.*;
 
+import lombok.*;
+
 /**
  * Wraps an underlying {@link XMLStreamWriter} to automatically add newlines and
  * indenting for elements. Elements that do no contain nested elements are
@@ -29,65 +31,41 @@ import javax.xml.stream.*;
  *
  * @author G. Meinders
  */
+@RequiredArgsConstructor
+@SuppressWarnings( "unused" )
 public class IndentingXMLStreamWriter
-implements XMLStreamWriter
+	implements XMLStreamWriter
 {
 	/**
 	 * Underlying writer.
 	 */
-	private final XMLStreamWriter _writer;
+	private final XMLStreamWriter writer;
 
 	/**
 	 * Current nesting depth, used for indenting.
 	 */
-	private int _depth = 0;
+	private int depth = 0;
 
 	/**
 	 * String inserted as a newline.  The default is {@code "\n"}.
 	 */
-	private String _newline = "\n";
+	@Getter
+	@Setter
+	private String newline = "\n";
 
 	/**
 	 * String inserted for each level of indenting. The default is {@code
 	 * "\t"}.
 	 */
-	private String _indent = "\t";
+	@Getter
+	@Setter
+	private String indent = "\t";
 
 	/**
-	 * Whether the current node contains no elements (like an
+	 * Whether the current node contains no elements (like a
 	 * 'xsd:simpleType').
 	 */
-	private boolean _simpleType = true;
-
-	/**
-	 * Constructs a new indenting writer.
-	 *
-	 * @param writer Underlying writer.
-	 */
-	public IndentingXMLStreamWriter( final XMLStreamWriter writer )
-	{
-		_writer = writer;
-	}
-
-	public String getNewline()
-	{
-		return _newline;
-	}
-
-	public void setNewline( final String newline )
-	{
-		_newline = newline;
-	}
-
-	public String getIndent()
-	{
-		return _indent;
-	}
-
-	public void setIndent( final String indent )
-	{
-		_indent = indent;
-	}
+	private boolean simpleType = true;
 
 	/**
 	 * Starts a new line with the proper amount of indenting and increases the
@@ -97,15 +75,15 @@ implements XMLStreamWriter
 	 * underlying stream.
 	 */
 	private void indentIn()
-	throws XMLStreamException
+		throws XMLStreamException
 	{
-		_writer.writeCharacters( getNewline() );
-		final int depth = _depth++;
-		for ( int i = 0; i < depth; i++ )
+		writer.writeCharacters( getNewline() );
+		var curDepth = depth++;
+		for ( var i = 0; i < curDepth; i++ )
 		{
-			_writer.writeCharacters( getIndent() );
+			writer.writeCharacters( getIndent() );
 		}
-		_simpleType = true;
+		simpleType = true;
 	}
 
 	/**
@@ -116,265 +94,265 @@ implements XMLStreamWriter
 	 * underlying stream.
 	 */
 	private void indentSame()
-	throws XMLStreamException
+		throws XMLStreamException
 	{
-		_writer.writeCharacters( getNewline() );
-		final int depth = _depth;
-		for ( int i = 0; i < depth; i++ )
+		writer.writeCharacters( getNewline() );
+		var curDepth = depth;
+		for ( var i = 0; i < curDepth; i++ )
 		{
-			_writer.writeCharacters( getIndent() );
+			writer.writeCharacters( getIndent() );
 		}
-		_simpleType = false;
+		simpleType = false;
 	}
 
 	/**
 	 * Decreases the nesting depth, and starts a new line with the proper amount
-	 * of indenting (except for a {@link #_simpleType}).
+	 * of indenting (except for a {@link #simpleType}).
 	 *
 	 * @throws XMLStreamException if the whitespace can't be written to the
 	 * underlying stream.
 	 */
 	private void indentOut()
-	throws XMLStreamException
+		throws XMLStreamException
 	{
-		final int depth = --_depth;
-		if ( !_simpleType )
+		var curDepth = --depth;
+		if ( !simpleType )
 		{
-			_writer.writeCharacters( getNewline() );
-			for ( int i = 0; i < depth; i++ )
+			writer.writeCharacters( getNewline() );
+			for ( var i = 0; i < curDepth; i++ )
 			{
-				_writer.writeCharacters( getIndent() );
+				writer.writeCharacters( getIndent() );
 			}
 		}
-		_simpleType = false;
+		simpleType = false;
 	}
 
 	@Override
-	public void writeStartElement( final String localName )
-	throws XMLStreamException
+	public void writeStartElement( String localName )
+		throws XMLStreamException
 	{
 		indentIn();
-		_writer.writeStartElement( localName );
+		writer.writeStartElement( localName );
 	}
 
 	@Override
-	public void writeStartElement( final String namespaceURI, final String localName )
-	throws XMLStreamException
+	public void writeStartElement( String namespaceURI, String localName )
+		throws XMLStreamException
 	{
 		indentIn();
-		_writer.writeStartElement( namespaceURI, localName );
+		writer.writeStartElement( namespaceURI, localName );
 	}
 
 	@Override
-	public void writeStartElement( final String prefix, final String localName, final String namespaceURI )
-	throws XMLStreamException
+	public void writeStartElement( String prefix, String localName, String namespaceURI )
+		throws XMLStreamException
 	{
 		indentIn();
-		_writer.writeStartElement( prefix, localName, namespaceURI );
+		writer.writeStartElement( prefix, localName, namespaceURI );
 	}
 
 	@Override
-	public void writeEmptyElement( final String namespaceURI, final String localName )
-	throws XMLStreamException
+	public void writeEmptyElement( String namespaceURI, String localName )
+		throws XMLStreamException
 	{
 		indentSame();
-		_writer.writeEmptyElement( namespaceURI, localName );
+		writer.writeEmptyElement( namespaceURI, localName );
 	}
 
 	@Override
-	public void writeEmptyElement( final String prefix, final String localName, final String namespaceURI )
-	throws XMLStreamException
+	public void writeEmptyElement( String prefix, String localName, String namespaceURI )
+		throws XMLStreamException
 	{
 		indentSame();
-		_writer.writeEmptyElement( prefix, localName, namespaceURI );
+		writer.writeEmptyElement( prefix, localName, namespaceURI );
 	}
 
 	@Override
-	public void writeEmptyElement( final String localName )
-	throws XMLStreamException
+	public void writeEmptyElement( String localName )
+		throws XMLStreamException
 	{
 		indentSame();
-		_writer.writeEmptyElement( localName );
+		writer.writeEmptyElement( localName );
 	}
 
 	@Override
 	public void writeEndElement()
-	throws XMLStreamException
+		throws XMLStreamException
 	{
 		indentOut();
-		_writer.writeEndElement();
+		writer.writeEndElement();
 	}
 
 	@Override
 	public void writeEndDocument()
-	throws XMLStreamException
+		throws XMLStreamException
 	{
-		_writer.writeEndDocument();
+		writer.writeEndDocument();
 	}
 
 	@Override
 	public void close()
-	throws XMLStreamException
+		throws XMLStreamException
 	{
-		_writer.close();
+		writer.close();
 	}
 
 	@Override
 	public void flush()
-	throws XMLStreamException
+		throws XMLStreamException
 	{
-		_writer.flush();
+		writer.flush();
 	}
 
 	@Override
-	public void writeAttribute( final String localName, final String value )
-	throws XMLStreamException
+	public void writeAttribute( String localName, String value )
+		throws XMLStreamException
 	{
-		_writer.writeAttribute( localName, value );
+		writer.writeAttribute( localName, value );
 	}
 
 	@Override
-	public void writeAttribute( final String prefix, final String namespaceURI, final String localName, final String value )
-	throws XMLStreamException
+	public void writeAttribute( String prefix, String namespaceURI, String localName, String value )
+		throws XMLStreamException
 	{
-		_writer.writeAttribute( prefix, namespaceURI, localName, value );
+		writer.writeAttribute( prefix, namespaceURI, localName, value );
 	}
 
 	@Override
-	public void writeAttribute( final String namespaceURI, final String localName, final String value )
-	throws XMLStreamException
+	public void writeAttribute( String namespaceURI, String localName, String value )
+		throws XMLStreamException
 	{
-		_writer.writeAttribute( namespaceURI, localName, value );
+		writer.writeAttribute( namespaceURI, localName, value );
 	}
 
 	@Override
-	public void writeNamespace( final String prefix, final String namespaceURI )
-	throws XMLStreamException
+	public void writeNamespace( String prefix, String namespaceURI )
+		throws XMLStreamException
 	{
-		_writer.writeNamespace( prefix, namespaceURI );
+		writer.writeNamespace( prefix, namespaceURI );
 	}
 
 	@Override
-	public void writeDefaultNamespace( final String namespaceURI )
-	throws XMLStreamException
+	public void writeDefaultNamespace( String namespaceURI )
+		throws XMLStreamException
 	{
-		_writer.writeDefaultNamespace( namespaceURI );
+		writer.writeDefaultNamespace( namespaceURI );
 	}
 
 	@Override
-	public void writeComment( final String data )
-	throws XMLStreamException
+	public void writeComment( String data )
+		throws XMLStreamException
 	{
-		_writer.writeComment( data );
+		writer.writeComment( data );
 	}
 
 	@Override
-	public void writeProcessingInstruction( final String target )
-	throws XMLStreamException
+	public void writeProcessingInstruction( String target )
+		throws XMLStreamException
 	{
-		_writer.writeProcessingInstruction( target );
+		writer.writeProcessingInstruction( target );
 	}
 
 	@Override
-	public void writeProcessingInstruction( final String target, final String data )
-	throws XMLStreamException
+	public void writeProcessingInstruction( String target, String data )
+		throws XMLStreamException
 	{
-		_writer.writeProcessingInstruction( target, data );
+		writer.writeProcessingInstruction( target, data );
 	}
 
 	@Override
-	public void writeCData( final String data )
-	throws XMLStreamException
+	public void writeCData( String data )
+		throws XMLStreamException
 	{
-		_writer.writeCData( data );
+		writer.writeCData( data );
 	}
 
 	@Override
-	public void writeDTD( final String dtd )
-	throws XMLStreamException
+	public void writeDTD( String dtd )
+		throws XMLStreamException
 	{
-		_writer.writeDTD( dtd );
+		writer.writeDTD( dtd );
 	}
 
 	@Override
-	public void writeEntityRef( final String name )
-	throws XMLStreamException
+	public void writeEntityRef( String name )
+		throws XMLStreamException
 	{
-		_writer.writeEntityRef( name );
+		writer.writeEntityRef( name );
 	}
 
 	@Override
 	public void writeStartDocument()
-	throws XMLStreamException
+		throws XMLStreamException
 	{
-		_writer.writeStartDocument();
+		writer.writeStartDocument();
 	}
 
 	@Override
-	public void writeStartDocument( final String version )
-	throws XMLStreamException
+	public void writeStartDocument( String version )
+		throws XMLStreamException
 	{
-		_writer.writeStartDocument( version );
+		writer.writeStartDocument( version );
 	}
 
 	@Override
-	public void writeStartDocument( final String encoding, final String version )
-	throws XMLStreamException
+	public void writeStartDocument( String encoding, String version )
+		throws XMLStreamException
 	{
-		_writer.writeStartDocument( encoding, version );
+		writer.writeStartDocument( encoding, version );
 	}
 
 	@Override
-	public void writeCharacters( final String text )
-	throws XMLStreamException
+	public void writeCharacters( String text )
+		throws XMLStreamException
 	{
-		_writer.writeCharacters( text );
+		writer.writeCharacters( text );
 	}
 
 	@Override
-	public void writeCharacters( final char[] text, final int start, final int len )
-	throws XMLStreamException
+	public void writeCharacters( char[] text, int start, int len )
+		throws XMLStreamException
 	{
-		_writer.writeCharacters( text, start, len );
+		writer.writeCharacters( text, start, len );
 	}
 
 	@Override
-	public String getPrefix( final String uri )
-	throws XMLStreamException
+	public String getPrefix( String uri )
+		throws XMLStreamException
 	{
-		return _writer.getPrefix( uri );
+		return writer.getPrefix( uri );
 	}
 
 	@Override
-	public void setPrefix( final String prefix, final String uri )
-	throws XMLStreamException
+	public void setPrefix( String prefix, String uri )
+		throws XMLStreamException
 	{
-		_writer.setPrefix( prefix, uri );
+		writer.setPrefix( prefix, uri );
 	}
 
 	@Override
-	public void setDefaultNamespace( final String uri )
-	throws XMLStreamException
+	public void setDefaultNamespace( String uri )
+		throws XMLStreamException
 	{
-		_writer.setDefaultNamespace( uri );
+		writer.setDefaultNamespace( uri );
 	}
 
 	@Override
-	public void setNamespaceContext( final NamespaceContext context )
-	throws XMLStreamException
+	public void setNamespaceContext( NamespaceContext context )
+		throws XMLStreamException
 	{
-		_writer.setNamespaceContext( context );
+		writer.setNamespaceContext( context );
 	}
 
 	@Override
 	public NamespaceContext getNamespaceContext()
 	{
-		return _writer.getNamespaceContext();
+		return writer.getNamespaceContext();
 	}
 
 	@Override
-	public Object getProperty( final String name )
+	public Object getProperty( String name )
 	{
-		return _writer.getProperty( name );
+		return writer.getProperty( name );
 	}
 }

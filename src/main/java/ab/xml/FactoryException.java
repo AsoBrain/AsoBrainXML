@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,51 +18,28 @@
  */
 package ab.xml;
 
+import java.io.*;
+
+import lombok.*;
+
 /**
  * Indicates that a factory instance could not be created.
  *
  * @author G. Meinders
  */
+@NoArgsConstructor
 public class FactoryException
-extends RuntimeException
+	extends RuntimeException
 {
-	/** Serialized data version. */
+	@Serial
 	private static final long serialVersionUID = 7574420257480434915L;
 
-	/**
-	 * Constructs a new instance.
-	 */
-	public FactoryException()
-	{
-	}
-
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param message Detail message.
-	 */
-	public FactoryException( final String message )
+	public FactoryException( String message )
 	{
 		super( message );
 	}
 
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param message Detail message.
-	 * @param cause   Cause of the exception.
-	 */
-	public FactoryException( final String message, final Throwable cause )
-	{
-		super( message, cause );
-	}
-
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param cause Cause of the exception.
-	 */
-	public FactoryException( final Throwable cause )
+	public FactoryException( Throwable cause )
 	{
 		super( cause.getMessage(), cause );
 	}

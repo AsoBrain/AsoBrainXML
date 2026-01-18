@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2022 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
 
 package ab.xml;
 
-import org.jetbrains.annotations.*;
+import org.jspecify.annotations.*;
 
 /**
  * Provides forward read-only access to XML documents.
@@ -29,6 +29,7 @@ import org.jetbrains.annotations.*;
  *
  * @author Gerrit Meinders
  */
+@SuppressWarnings( "unused" )
 public interface XMLReader
 {
 	/**
@@ -38,7 +39,6 @@ public interface XMLReader
 	 *
 	 * @return Current event type.
 	 */
-	@NotNull
 	XMLEventType getEventType();
 
 	/**
@@ -50,7 +50,6 @@ public interface XMLReader
 	 * @throws IllegalStateException if called after a previous call returned
 	 * {@link XMLEventType#END_DOCUMENT}.
 	 */
-	@NotNull
 	XMLEventType next()
 	throws XMLException;
 
@@ -76,7 +75,6 @@ public interface XMLReader
 	 * @throws IllegalStateException if the current event is not {@link
 	 * XMLEventType#START_ELEMENT} or {@link XMLEventType#END_ELEMENT}.
 	 */
-	@NotNull
 	String getLocalName();
 
 	/**
@@ -120,7 +118,6 @@ public interface XMLReader
 	 * XMLEventType#START_ELEMENT} and {@code index < 0} or {@code index &gt;=
 	 * getAttributeCount()}.
 	 */
-	@NotNull
 	String getAttributeLocalName( int index );
 
 	/**
@@ -136,7 +133,6 @@ public interface XMLReader
 	 * XMLEventType#START_ELEMENT} and {@code index < 0} or {@code index &gt;=
 	 * getAttributeCount()}.
 	 */
-	@NotNull
 	String getAttributeValue( int index );
 
 	/**
@@ -150,7 +146,7 @@ public interface XMLReader
 	 * XMLEventType#START_ELEMENT}.
 	 */
 	@Nullable
-	String getAttributeValue( @NotNull String localName );
+	String getAttributeValue( String localName );
 
 	/**
 	 * Returns the value of the specified attribute.
@@ -165,7 +161,7 @@ public interface XMLReader
 	 * XMLEventType#START_ELEMENT}.
 	 */
 	@Nullable
-	String getAttributeValue( @Nullable String namespaceURI, @NotNull String localName );
+	String getAttributeValue( @Nullable String namespaceURI, String localName );
 
 	/**
 	 * Returns the character data for the current event.
@@ -175,7 +171,6 @@ public interface XMLReader
 	 * @throws IllegalStateException if the current event is not {@link
 	 * XMLEventType#CHARACTERS}.
 	 */
-	@NotNull
 	String getText();
 
 	/**
@@ -186,7 +181,6 @@ public interface XMLReader
 	 * @throws IllegalStateException if the current event is not {@link
 	 * XMLEventType#PROCESSING_INSTRUCTION}.
 	 */
-	@NotNull
 	String getPITarget();
 
 	/**
@@ -197,7 +191,6 @@ public interface XMLReader
 	 * @throws IllegalStateException if the current event is not {@link
 	 * XMLEventType#PROCESSING_INSTRUCTION}.
 	 */
-	@NotNull
 	String getPIData();
 
 	/**

@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,7 @@
  */
 package ab.xml;
 
-import org.jetbrains.annotations.*;
+import org.jspecify.annotations.*;
 
 /**
  * Writer for XML documents.
@@ -47,6 +47,7 @@ import org.jetbrains.annotations.*;
  *
  * @author G. Meinders
  */
+@SuppressWarnings( "unused" )
 public interface XMLWriter
 {
 	/**
@@ -58,7 +59,7 @@ public interface XMLWriter
 	 *
 	 * @throws XMLException if an XML-related error occurs.
 	 */
-	void setPrefix( @NotNull String prefix, @NotNull String namespaceURI )
+	void setPrefix( String prefix, String namespaceURI )
 	throws XMLException;
 
 	/**
@@ -79,7 +80,7 @@ public interface XMLWriter
 	 *
 	 * @throws XMLException if an XML-related error occurs.
 	 */
-	void startTag( @Nullable String namespaceURI, @NotNull String localName )
+	void startTag( @Nullable String namespaceURI, String localName )
 	throws XMLException;
 
 	/**
@@ -91,7 +92,7 @@ public interface XMLWriter
 	 *
 	 * @throws XMLException if an XML-related error occurs.
 	 */
-	void emptyTag( @Nullable String namespaceURI, @NotNull String localName )
+	void emptyTag( @Nullable String namespaceURI, String localName )
 	throws XMLException;
 
 	/**
@@ -103,7 +104,7 @@ public interface XMLWriter
 	 *
 	 * @throws XMLException if an XML-related error occurs.
 	 */
-	void attribute( @Nullable String namespaceURI, @NotNull String localName, @NotNull String value )
+	void attribute( @Nullable String namespaceURI, String localName, String value )
 	throws XMLException;
 
 	/**
@@ -113,7 +114,7 @@ public interface XMLWriter
 	 *
 	 * @throws XMLException if an XML-related error occurs.
 	 */
-	void text( @NotNull String characters )
+	void text( String characters )
 	throws XMLException;
 
 	/**
@@ -124,7 +125,7 @@ public interface XMLWriter
 	 *
 	 * @throws XMLException if an XML-related error occurs.
 	 */
-	void endTag( @Nullable String namespaceURI, @NotNull String localName )
+	void endTag( @Nullable String namespaceURI, String localName )
 	throws XMLException;
 
 	/**

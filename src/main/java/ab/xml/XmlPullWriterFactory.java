@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@ import org.xmlpull.v1.*;
  *
  * @author G. Meinders
  */
+@SuppressWarnings( "unused" )
 public class XmlPullWriterFactory
 extends XMLWriterFactory
 {
@@ -36,17 +37,14 @@ extends XMLWriterFactory
 	 */
 	private final XmlPullParserFactory _parserFactory;
 
-	/**
-	 * Constructs a new instance.
-	 */
 	public XmlPullWriterFactory()
 	{
-		final XmlPullParserFactory parserFactory;
+		XmlPullParserFactory parserFactory;
 		try
 		{
 			parserFactory = XmlPullParserFactory.newInstance();
 		}
-		catch ( final XmlPullParserException e )
+		catch ( XmlPullParserException e )
 		{
 			throw new FactoryException( e );
 		}
@@ -54,7 +52,7 @@ extends XMLWriterFactory
 	}
 
 	@Override
-	public XMLWriter createXMLWriter( final OutputStream out, final String encoding )
+	public XMLWriter createXMLWriter( OutputStream out, String encoding )
 	throws XMLException
 	{
 		XmlSerializer serializer;
@@ -62,7 +60,7 @@ extends XMLWriterFactory
 		{
 			serializer = _parserFactory.newSerializer();
 		}
-		catch ( final XmlPullParserException e )
+		catch ( XmlPullParserException e )
 		{
 			throw new XMLException( e );
 		}
@@ -71,14 +69,14 @@ extends XMLWriterFactory
 		{
 			serializer.setOutput( out, encoding );
 		}
-		catch ( final IOException e )
+		catch ( IOException e )
 		{
 			throw new XMLException( e );
 		}
 
 		if ( isIndenting() )
 		{
-			final IndentingXmlSerializer indenting = new IndentingXmlSerializer( serializer );
+			IndentingXmlSerializer indenting = new IndentingXmlSerializer( serializer );
 			indenting.setNewline( getNewline() );
 			indenting.setIndent( getIndent() );
 			serializer = indenting;
@@ -88,7 +86,7 @@ extends XMLWriterFactory
 	}
 
 	@Override
-	public XMLWriter createXMLWriter( final Writer writer, final String encoding )
+	public XMLWriter createXMLWriter( Writer writer, String encoding )
 	throws XMLException
 	{
 		XmlSerializer serializer;
@@ -96,7 +94,7 @@ extends XMLWriterFactory
 		{
 			serializer = _parserFactory.newSerializer();
 		}
-		catch ( final XmlPullParserException e )
+		catch ( XmlPullParserException e )
 		{
 			throw new XMLException( e );
 		}
@@ -105,14 +103,14 @@ extends XMLWriterFactory
 		{
 			serializer.setOutput( writer );
 		}
-		catch ( final IOException e )
+		catch ( IOException e )
 		{
 			throw new XMLException( e );
 		}
 
 		if ( isIndenting() )
 		{
-			final IndentingXmlSerializer indenting = new IndentingXmlSerializer( serializer );
+			IndentingXmlSerializer indenting = new IndentingXmlSerializer( serializer );
 			indenting.setNewline( getNewline() );
 			indenting.setIndent( getIndent() );
 			serializer = indenting;

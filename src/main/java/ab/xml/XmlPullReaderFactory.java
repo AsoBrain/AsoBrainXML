@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,6 @@ package ab.xml;
 
 import java.io.*;
 
-import org.jetbrains.annotations.*;
 import org.xmlpull.v1.*;
 
 /**
@@ -34,36 +33,32 @@ extends XMLReaderFactory
 	/**
 	 * Factory used to create XML Pull readers.
 	 */
-	private final XmlPullParserFactory _factory;
+	private final XmlPullParserFactory factory;
 
-	/**
-	 * Constructs a new instance.
-	 */
-	public XmlPullReaderFactory()
+	XmlPullReaderFactory()
 	{
 		try
 		{
-			final XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+			factory = XmlPullParserFactory.newInstance();
 			factory.setNamespaceAware( true );
-			_factory = factory;
 		}
-		catch ( final XmlPullParserException e )
+		catch ( XmlPullParserException e )
 		{
 			throw new FactoryException( e );
 		}
 	}
 
 	@Override
-	public XMLReader createXMLReader( @NotNull final InputStream in, final String encoding )
+	public XMLReader createXMLReader( InputStream in, String encoding )
 	throws XMLException
 	{
-		final XmlPullParser parser;
+		XmlPullParser parser;
 		try
 		{
-			parser = _factory.newPullParser();
+			parser = factory.newPullParser();
 			parser.setInput( in, encoding );
 		}
-		catch ( final XmlPullParserException e )
+		catch ( XmlPullParserException e )
 		{
 			throw new XMLException( e );
 		}

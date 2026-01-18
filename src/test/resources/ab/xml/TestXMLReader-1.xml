@@ -2,10 +2,10 @@
 <?magic processing instruction 1?>
 <?magic?>
 <!DOCTYPE example PUBLIC "-" "urn:www.example.com">
-<example xmlns:ns2="http://www.example.com/ns2">
+<example xmlns:ns2="https://www.example.com/ns2">
 	<ns1:element1
-			xmlns:ns1="http://www.example.com/ns1"
-			xmlns="http://www.example.com/default"
+	xmlns:ns1="https://www.example.com/ns1"
+	xmlns="https://www.example.com/default"
 			ns1:attribute1="value1"
 			attribute2="value2">
 		<element2 attribute3="value3" />

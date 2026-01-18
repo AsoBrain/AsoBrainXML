@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2019 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,8 @@ import java.io.*;
 import java.util.*;
 import javax.xml.namespace.*;
 
-import org.jetbrains.annotations.*;
+import lombok.*;
+import org.jspecify.annotations.*;
 import org.xmlpull.v1.*;
 
 /**
@@ -33,79 +34,48 @@ import org.xmlpull.v1.*;
  *
  * @author G. Meinders
  */
+@RequiredArgsConstructor
+@SuppressWarnings( "unused" )
 public class IndentingXmlSerializer
-implements XmlSerializer
+	implements XmlSerializer
 {
 	/**
 	 * Underlying writer.
 	 */
-	@NotNull
-	private final XmlSerializer _writer;
+	private final XmlSerializer writer;
 
 	/**
 	 * Current nesting depth, used for indenting.
 	 */
-	private int _depth = 0;
+	private int depth = 0;
 
 	/**
-	 * String inserted as a newline. The default is <code>"\n"</code>.
+	 * String inserted as a newline. The default is {@code "\n"}.
 	 */
-	@NotNull
-	private String _newline = "\n";
+	@Getter
+	@Setter
+	private String newline = "\n";
 
 	/**
 	 * String inserted for each level of indenting. The default is
-	 * <code>"\t"</code>.
+	 * {@code "\t"}.
 	 */
-	@NotNull
-	private String _indent = "\t";
+	@Getter
+	@Setter
+	private String indent = "\t";
 
 	/**
-	 * Whether the current node contains no elements (like an
+	 * Whether the current node contains no elements (like a
 	 * 'xsd:simpleType').
 	 */
-	private boolean _simpleType = true;
+	private boolean simpleType = true;
 
 	/**
 	 * List of prefixes to set. For compatibility with the xpp3 implementation
 	 * of {@link XmlSerializer}, prefixes have to be set immediately before
 	 * {@link XmlSerializer#startTag} (i.e. after indentation).
 	 */
-	private final List<QName> _setPrefix = new ArrayList<QName>();
-
-	/**
-	 * Constructs a new indenting writer.
-	 *
-	 * @param writer Underlying writer.
-	 */
-	public IndentingXmlSerializer( @NotNull final XmlSerializer writer )
-	{
-		_writer = writer;
-	}
-
-	@SuppressWarnings( "WeakerAccess" )
-	@NotNull
-	public String getNewline()
-	{
-		return _newline;
-	}
-
-	public void setNewline( @NotNull final String newline )
-	{
-		_newline = newline;
-	}
-
-	@SuppressWarnings( "WeakerAccess" )
-	@NotNull
-	public String getIndent()
-	{
-		return _indent;
-	}
-
-	public void setIndent( @NotNull final String indent )
-	{
-		_indent = indent;
-	}
+	private final List<QName> setPrefix = new ArrayList<>();
 
 	/**
 	 * Starts a new line with the proper amount of indenting and increases the
@@ -114,232 +84,219 @@ implements XmlSerializer
 	 * @throws IOException if an I/O error occurs.
 	 */
 	private void indentIn()
-	throws IOException
+		throws IOException
 	{
-		_writer.text( getNewline() );
-		final int depth = _depth++;
-		for ( int i = 0; i < depth; i++ )
+		writer.text( getNewline() );
+		var curDepth = depth++;
+		for ( var i = 0; i < curDepth; i++ )
 		{
-			_writer.text( getIndent() );
+			writer.text( getIndent() );
 		}
-		_simpleType = true;
+		simpleType = true;
 	}
 
 	/**
 	 * Decreases the nesting depth, and starts a new line with the proper amount
-	 * of indenting (except for a {@link #_simpleType}).
+	 * of indenting (except for a {@link #simpleType}).
 	 *
 	 * @throws IOException if an I/O error occurs.
 	 */
 	private void indentOut()
-	throws IOException
+		throws IOException
 	{
-		final int depth = --_depth;
-		if ( !_simpleType )
+		var curDepth = --depth;
+		if ( !simpleType )
 		{
-			_writer.text( getNewline() );
-			for ( int i = 0; i < depth; i++ )
+			writer.text( getNewline() );
+			for ( var i = 0; i < curDepth; i++ )
 			{
-				_writer.text( getIndent() );
+				writer.text( getIndent() );
 			}
 		}
-		_simpleType = false;
+		simpleType = false;
 	}
 
-	@NotNull
 	@Override
-	public XmlSerializer startTag( final String namespace, final String name )
-	throws IOException
+	public XmlSerializer startTag( String namespace, String name )
+		throws IOException
 	{
 		indentIn();
-		for ( final QName entry : _setPrefix )
+		for ( var entry : setPrefix )
 		{
-			_writer.setPrefix( entry.getPrefix(), entry.getNamespaceURI() );
+			writer.setPrefix( entry.getPrefix(), entry.getNamespaceURI() );
 		}
-		_setPrefix.clear();
-		_writer.startTag( namespace, name );
+		setPrefix.clear();
+		writer.startTag( namespace, name );
 		return this;
 	}
 
-	@NotNull
 	@Override
-	public XmlSerializer endTag( final String namespace, final String name )
-	throws IOException
+	public XmlSerializer endTag( String namespace, String name )
+		throws IOException
 	{
 		indentOut();
-		_writer.endTag( namespace, name );
+		writer.endTag( namespace, name );
 		return this;
 	}
 
 	@Override
 	public void endDocument()
-	throws IOException
+		throws IOException
 	{
-		_writer.endDocument();
+		writer.endDocument();
 	}
 
 	@Override
 	public void flush()
-	throws IOException
+		throws IOException
 	{
-		_writer.flush();
+		writer.flush();
 	}
 
-	@NotNull
 	@Override
-	public XmlSerializer attribute( final String namespace, final String name, final String value )
-	throws IOException
+	public XmlSerializer attribute( String namespace, String name, String value )
+		throws IOException
 	{
-		_writer.attribute( namespace, name, value );
+		writer.attribute( namespace, name, value );
 		return this;
 	}
 
 	@Override
-	public void setFeature( final String name, final boolean state )
+	public void setFeature( String name, boolean state )
 	{
-		_writer.setFeature( name, state );
+		writer.setFeature( name, state );
 	}
 
 	@Override
-	public boolean getFeature( final String name )
+	public boolean getFeature( String name )
 	{
-		return _writer.getFeature( name );
+		return writer.getFeature( name );
 	}
 
 	@Override
-	public void setProperty( @NotNull final String name, @Nullable final Object value )
+	public void setProperty( String name, @Nullable Object value )
 	{
-		_writer.setProperty( name, value );
-	}
-
-	@Nullable
-	@Override
-	public Object getProperty( @NotNull final String name )
-	{
-		return _writer.getProperty( name );
+		writer.setProperty( name, value );
 	}
 
 	@Override
-	public void setOutput( @NotNull final OutputStream os, @Nullable final String encoding )
-	throws IOException
+	public @Nullable Object getProperty( String name )
 	{
-		_writer.setOutput( os, encoding );
+		return writer.getProperty( name );
 	}
 
 	@Override
-	public void setOutput( @NotNull final Writer writer )
-	throws IOException
+	public void setOutput( OutputStream os, @Nullable String encoding )
+		throws IOException
 	{
-		_writer.setOutput( writer );
+		writer.setOutput( os, encoding );
 	}
 
 	@Override
-	public void startDocument( @Nullable final String encoding, @Nullable final Boolean standalone )
-	throws IOException
+	public void setOutput( Writer writer )
+		throws IOException
 	{
-		_writer.startDocument( encoding, standalone );
+		this.writer.setOutput( writer );
 	}
 
 	@Override
-	public void setPrefix( @NotNull final String prefix, @NotNull final String namespace )
+	public void startDocument( @Nullable String encoding, @Nullable Boolean standalone )
+		throws IOException
 	{
-		_setPrefix.add( new QName( namespace, "", prefix ) );
+		writer.startDocument( encoding, standalone );
 	}
 
-	@Contract( "_, true -> !null; _, false -> _" )
 	@Override
-	public String getPrefix( @NotNull final String namespace, final boolean generatePrefix )
+	public void setPrefix( String prefix, String namespace )
 	{
-		String result = null;
-		for ( final QName entry : _setPrefix )
+		setPrefix.add( new QName( namespace, "", prefix ) );
+	}
+
+	//@Contract( "_, true -> !null; _, false -> _" )
+	@Override
+	public String getPrefix( String namespace, boolean generatePrefix )
+	{
+		for ( var entry : setPrefix )
 		{
 			if ( namespace.equals( entry.getNamespaceURI() ) )
 			{
-				result = entry.getPrefix();
+				return entry.getPrefix();
 			}
 		}
-		if ( result == null )
-		{
-			result = _writer.getPrefix( namespace, generatePrefix );
-		}
-		return result;
+		return writer.getPrefix( namespace, generatePrefix );
 	}
 
 	@Override
 	public int getDepth()
 	{
-		return _writer.getDepth();
-	}
-
-	@Nullable
-	@Override
-	public String getNamespace()
-	{
-		return _writer.getNamespace();
-	}
-
-	@Nullable
-	@Override
-	public String getName()
-	{
-		return _writer.getName();
-	}
-
-	@NotNull
-	@Override
-	public XmlSerializer text( @NotNull final String text )
-	throws IOException
-	{
-		return _writer.text( text );
-	}
-
-	@NotNull
-	@Override
-	public XmlSerializer text( @NotNull final char[] buf, final int start, final int len )
-	throws IOException
-	{
-		return _writer.text( buf, start, len );
+		return writer.getDepth();
 	}
 
 	@Override
-	public void cdsect( @NotNull final String text )
-	throws IOException
+	public @Nullable String getNamespace()
 	{
-		_writer.cdsect( text );
+		return writer.getNamespace();
 	}
 
 	@Override
-	public void entityRef( @NotNull final String text )
-	throws IOException
+	public @Nullable String getName()
 	{
-		_writer.entityRef( text );
+		return writer.getName();
 	}
 
 	@Override
-	public void processingInstruction( @NotNull final String text )
-	throws IOException
+	public XmlSerializer text( String text )
+		throws IOException
 	{
-		_writer.processingInstruction( text );
+		return writer.text( text );
 	}
 
 	@Override
-	public void comment( @NotNull final String text )
-	throws IOException
+	public XmlSerializer text( char[] buf, int start, int len )
+		throws IOException
 	{
-		_writer.comment( text );
+		return writer.text( buf, start, len );
 	}
 
 	@Override
-	public void docdecl( @NotNull final String text )
-	throws IOException
+	public void cdsect( String text )
+		throws IOException
 	{
-		_writer.docdecl( text );
+		writer.cdsect( text );
 	}
 
 	@Override
-	public void ignorableWhitespace( @NotNull final String text )
-	throws IOException
+	public void entityRef( String text )
+		throws IOException
 	{
-		_writer.ignorableWhitespace( text );
+		writer.entityRef( text );
+	}
+
+	@Override
+	public void processingInstruction( String text )
+		throws IOException
+	{
+		writer.processingInstruction( text );
+	}
+
+	@Override
+	public void comment( String text )
+		throws IOException
+	{
+		writer.comment( text );
+	}
+
+	@Override
+	public void docdecl( String text )
+		throws IOException
+	{
+		writer.docdecl( text );
+	}
+
+	@Override
+	public void ignorableWhitespace( String text )
+		throws IOException
+	{
+		writer.ignorableWhitespace( text );
 	}
 }

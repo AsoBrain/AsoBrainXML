@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,8 @@ import java.util.*;
 import javax.xml.*;
 import javax.xml.parsers.*;
 
-import org.jetbrains.annotations.*;
+import lombok.*;
+import org.jspecify.annotations.*;
 import org.w3c.dom.*;
 
 /**
@@ -30,28 +31,30 @@ import org.w3c.dom.*;
  *
  * @author  Peter S. Heijnen
  */
+@SuppressWarnings( "WeakerAccess" )
 public class DomXmlWriter
 implements XMLWriter
 {
 	/**
 	 * Written XML document.
 	 */
-	private Document _document;
+	@Getter
+	private @Nullable Document document;
 
 	/**
 	 * Current DOM node.
 	 */
-	private Node _node;
+	private @Nullable Node node;
 
 	/**
 	 * {@code true} if the writer is currently writing an empty tag.
 	 */
-	private boolean _empty = false;
+	private boolean empty = false;
 
 	/**
 	 * Namespace declarations that need to be added to the next start element.
 	 */
-	private final Deque<Map<String, String>> _nsPrefixStack;
+	private final Deque<Map<String, String>> nsPrefixStack = new LinkedList<>();
 
 	/**
 	 * Construct writer for a new document. Use {@link #startDocument()} to
@@ -69,74 +72,61 @@ implements XMLWriter
 	 * @param document Document being written.
 	 * @param node     Node to start at.
 	 */
-	public DomXmlWriter( final Document document, final Node node )
+	public DomXmlWriter( @Nullable Document document, @Nullable Node node )
 	{
-		_document = document;
-		_node = node;
-
-		final Deque<Map<String, String>> nsPrefixStack = new LinkedList<Map<String, String>>();
-		nsPrefixStack.add( new LinkedHashMap<String, String>() );
-		_nsPrefixStack = nsPrefixStack;
-	}
-
-	public Document getDocument()
-	{
-		return _document;
+		this.document = document;
+		this.node = node;
+		nsPrefixStack.add( new LinkedHashMap<>() );
 	}
 
 	@Override
 	public void startDocument()
 	throws XMLException
 	{
-		if ( _document != null )
+		if ( document != null )
 		{
 			throw new XMLException( "Can't start document. We already have a document." );
 		}
 
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		var dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware( true );
 
-		final DocumentBuilder db;
+		DocumentBuilder db;
 		try
 		{
 			db = dbf.newDocumentBuilder();
 		}
-		catch ( final ParserConfigurationException e )
+		catch ( ParserConfigurationException e )
 		{
 			throw new XMLException( e );
 		}
 
-		final Document document = db.newDocument();
-		_document = document;
-		_node = document;
+		document = db.newDocument();
+		node = document;
 	}
 
 	@Override
-	public void setPrefix( @NotNull final String prefix, @NotNull final String namespaceURI )
-	throws XMLException
+	public void setPrefix( String prefix, String namespaceURI )
 	{
-		final Map<String, String> nsPrefixes = _nsPrefixStack.getLast();
+		var nsPrefixes = nsPrefixStack.getLast();
 		nsPrefixes.put( namespaceURI, prefix );
 	}
 
 	@Override
-	public void startTag( final String namespaceURI, @NotNull final String localName )
+	public void startTag( String namespaceURI, String localName )
 	throws XMLException
 	{
-		if ( _empty )
+		if ( empty )
 		{
 			throw new XMLException( "Not allowed inside an empty tag. Use 'endTag' first." );
 		}
-
-		final Document document = _document;
-		final Node node = _node;
 
 		if ( ( document == null ) || ( node == null ) )
 		{
 			throw new XMLException( "Can't start tag before the document is started" );
 		}
 
-		final Element element;
+		Element element;
 
 		if ( namespaceURI != null )
 		{
@@ -147,40 +137,37 @@ implements XMLWriter
 			element = document.createElementNS( XMLConstants.DEFAULT_NS_PREFIX, localName );
 		}
 
-		final Map<String, String> nsPrefixes = _nsPrefixStack.getLast();
-		for ( final Map.Entry<String, String> entry : nsPrefixes.entrySet() )
+		var nsPrefixes = nsPrefixStack.getLast();
+		for ( var entry : nsPrefixes.entrySet() )
 		{
-			final String namespaceUri = entry.getKey();
-			final String prefix = entry.getValue();
+			var namespaceUri = entry.getKey();
+			var prefix = entry.getValue();
+			//noinspection HttpUrlsUsage
 			element.setAttributeNS( "http://www.w3.org/2000/xmlns/", "xmlns:" + prefix, namespaceUri );
 		}
 
-		_nsPrefixStack.add( new LinkedHashMap<String, String>() );
+		nsPrefixStack.add( new LinkedHashMap<>() );
 
 		node.appendChild( element );
-		_node = element;
+		node = element;
 	}
 
 	@Override
-	public void emptyTag( final String namespaceURI, @NotNull final String localName )
+	public void emptyTag( String namespaceURI, String localName )
 	throws XMLException
 	{
 		startTag( namespaceURI, localName );
-		_empty = true;
+		empty = true;
 	}
 
 	@Override
-	public void attribute( final String namespaceURI, @NotNull final String localName, @NotNull final String value )
+	public void attribute( String namespaceURI, String localName, String value )
 	throws XMLException
 	{
-		final Node node = _node;
-
-		if ( !( node instanceof Element ) )
+		if ( !( node instanceof Element element ) )
 		{
 			throw new XMLException( "Must start tag before setting attributes" );
 		}
-
-		final Element element = (Element)node;
 
 		if ( namespaceURI == null )
 		{
@@ -193,26 +180,22 @@ implements XMLWriter
 	}
 
 	@Override
-	public void text( @NotNull final String characters )
+	public void text( String characters )
 	throws XMLException
 	{
-		if ( _empty )
+		if ( empty )
 		{
 			throw new XMLException( "Not allowed inside an empty tag. Use 'endTag' first." );
 		}
-
-		final Document document = _document;
-		final Node node = _node;
 
 		if ( ( document == null ) || ( node == null ) )
 		{
 			throw new XMLException( "Can't start tag before the document is started" );
 		}
 
-		final Node lastChild = node.getLastChild();
-		if ( lastChild instanceof Text )
+		var lastChild = node.getLastChild();
+		if ( lastChild instanceof Text text )
 		{
-			final Text text = (Text)lastChild;
 			text.appendData( characters );
 		}
 		else
@@ -222,39 +205,35 @@ implements XMLWriter
 	}
 
 	@Override
-	public void endTag( final String namespaceURI, @NotNull final String localName )
+	public void endTag( String namespaceURI, String localName )
 	throws XMLException
 	{
-		_empty = false;
+		empty = false;
 
-		final Node node = _node;
+		var nodeNamespaceURI = Objects.requireNonNull( node, "Must have node by now" ).getNamespaceURI();
+		var nodeLocalName = node.getLocalName();
 
-		final String nodeNamespaceURI = node.getNamespaceURI();
-		final String nodeLocalName = node.getLocalName();
-
-		if ( !localName.equals( nodeLocalName ) || ( ( namespaceURI == null ) ? ( nodeNamespaceURI != null ) : !namespaceURI.equals( nodeNamespaceURI ) ) )
+		if ( !localName.equals( nodeLocalName ) || ( !Objects.equals( namespaceURI, nodeNamespaceURI ) ) )
 		{
-			throw new XMLException( "Unbalanced end tag (<" + getQualifiedName( nodeNamespaceURI, nodeLocalName ) + " xml:ns=\"" + nodeNamespaceURI + "\"> vs </" + getQualifiedName( namespaceURI, localName ) + " xml:ns=\"" + namespaceURI + "\">" );
+			throw new XMLException( "Unbalanced end tag (<%s xml:ns=\"%s\"> vs </%s xml:ns=\"%s\">".formatted( getQualifiedName( nodeNamespaceURI, nodeLocalName ), nodeNamespaceURI,
+			                                                                                                   getQualifiedName( namespaceURI, localName ), namespaceURI ) );
 		}
 
-		_nsPrefixStack.removeLast();
-		_node = node.getParentNode();
+		nsPrefixStack.removeLast();
+		node = node.getParentNode();
 	}
 
 	@Override
 	public void endDocument()
 	throws XMLException
 	{
-		final Document document = _document;
-		final Node node = _node;
-
 		if ( ( document == null ) || ( node == null ) )
 		{
 			throw new XMLException( "Can't end document before the document is started" );
 		}
 
 		//noinspection ObjectEquality
-		if ( _node != _document )
+		if ( node != document )
 		{
 			throw new XMLException( "Can't end document before the document is started" );
 		}
@@ -262,8 +241,8 @@ implements XMLWriter
 
 	@Override
 	public void flush()
-	throws XMLException
 	{
+		// nothing to do
 	}
 
 	/**
@@ -273,23 +252,20 @@ implements XMLWriter
 	 * @param localName    Local name of the node/attribute.
 	 *
 	 * @return Qualified name based on namespace URI and known prefixes; {@code
-	 * localName} if name could no be qualified.
+	 * localName} if name could not be qualified.
 	 */
-	private String getQualifiedName( final String namespaceURI, final String localName )
+	private String getQualifiedName( String namespaceURI, String localName )
 	{
-		String result = localName;
-
-		for ( final Iterator<Map<String, String>> it = _nsPrefixStack.descendingIterator(); it.hasNext(); )
+		for ( var it = nsPrefixStack.descendingIterator(); it.hasNext(); )
 		{
-			final Map<String, String> nsPrefixes = it.next();
-			final String prefix = nsPrefixes.get( namespaceURI );
+			var nsPrefixes = it.next();
+			var prefix = nsPrefixes.get( namespaceURI );
 			if ( prefix != null )
 			{
-				result = prefix + ':' + localName;
-				break;
+				return prefix + ':' + localName;
 			}
 		}
 
-		return result;
+		return localName;
 	}
 }
