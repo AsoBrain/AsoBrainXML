@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,67 +21,59 @@ package ab.xml;
 import java.io.*;
 import javax.xml.stream.*;
 
-import org.jetbrains.annotations.*;
+import lombok.extern.slf4j.*;
 
 /**
  * Factory for XML readers that use StAX, the Streaming API for XML.
  *
  * @author G. Meinders
  */
+@Slf4j
 class StaxReaderFactory
-extends XMLReaderFactory
+	extends XMLReaderFactory
 {
 	/**
 	 * Factory used to create StAX readers.
 	 */
-	private final XMLInputFactory _factory;
+	private final XMLInputFactory factory;
 
-	/**
-	 * Constructs a new instance.
-	 */
-	public StaxReaderFactory()
+	StaxReaderFactory()
+	{
+		factory = newFactory();
+		factory.setProperty( XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.TRUE );
+		factory.setProperty( XMLInputFactory.IS_COALESCING, Boolean.TRUE );
+		factory.setProperty( XMLInputFactory.SUPPORT_DTD, Boolean.FALSE );
+	}
+
+	@SuppressWarnings( "ErrorNotRethrown" )
+	private XMLInputFactory newFactory()
 	{
 		try
 		{
-			XMLInputFactory factory;
-			try
-			{
-				// NOTE: For OpenJDK, this requires a file 'META-INF/services/com.sun.xml.internal.stream.XMLInputFactoryImpl' containing the factory class name.
-				factory = XMLInputFactory.newFactory( "com.sun.xml.internal.stream.XMLInputFactoryImpl", getClass().getClassLoader() );
-			}
-			catch ( final FactoryConfigurationError ignored )
-			{
-				factory = XMLInputFactory.newFactory();
-				System.err.println( getClass().getName() + ": Using StAX factory class " + factory.getClass().getName() + ", which is not the recommended implementation." );
-			}
-
-			factory.setProperty( XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.TRUE );
-			factory.setProperty( XMLInputFactory.IS_COALESCING, Boolean.TRUE );
-			factory.setProperty( XMLInputFactory.SUPPORT_DTD, Boolean.FALSE );
-
-			_factory = factory;
+			// NOTE: For OpenJDK, this requires a file 'META-INF/services/com.sun.xml.internal.stream.XMLInputFactoryImpl' containing the factory class name.
+			return XMLInputFactory.newFactory( "com.sun.xml.internal.stream.XMLInputFactoryImpl", getClass().getClassLoader() );
 		}
-		catch ( final FactoryConfigurationError e )
+		catch ( FactoryConfigurationError ignored )
 		{
-			throw new FactoryException( e );
+			var defaultFactory = XMLInputFactory.newFactory();
+			Class<?> factoryClass = defaultFactory.getClass();
+			log.atWarn().log( () -> "%s: Using StAX factory class %s, which is not the recommended implementation.".formatted( getClass().getName(), factoryClass.getName() ) );
+			return defaultFactory;
 		}
 	}
 
 	@Override
-	public XMLReader createXMLReader( @NotNull final InputStream in, final String encoding )
-	throws XMLException
+	public XMLReader createXMLReader( InputStream in, String encoding )
+		throws XMLException
 	{
-		final XMLStreamReader reader;
 		try
 		{
-			final XMLInputFactory factory = _factory;
-			reader = factory.createXMLStreamReader( in, encoding );
+			return new StaxReader( factory.createXMLStreamReader( in, encoding ) );
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 
-		return new StaxReader( reader );
 	}
 }

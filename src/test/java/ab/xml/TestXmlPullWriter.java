@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 2019-2019 Peter S. Heijnen
+ * Copyright (C) 2019-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,32 +20,33 @@ package ab.xml;
 
 import java.io.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Unit test for {@link XmlPullWriter}.
  *
  * @author Gerrit Meinders
  */
-public class TestXmlPullWriter
+class TestXmlPullWriter
 {
 	/**
 	 * Tests that a simple document with namespaces can be written.
 	 *
 	 * @throws Exception if the test fails.
 	 */
+	@SuppressWarnings( "TestMethodWithoutAssertion" )
 	@Test
-	public void testDocument1()
-	throws Exception
+	void testDocument1()
+		throws Exception
 	{
-		final XMLWriterFactory xmlWriterFactory = XmlPullWriterFactory.newInstance();
+		var xmlWriterFactory = XMLWriterFactory.newInstance();
 		xmlWriterFactory.setIndenting( true );
 
-		final ByteArrayOutputStream actual = new ByteArrayOutputStream();
-		final String charset = "UTF-8";
-		final XMLWriter xmlWriter = xmlWriterFactory.createXMLWriter( actual, charset );
+		var actual = new ByteArrayOutputStream();
+		var charset = "UTF-8";
+		var xmlWriter = xmlWriterFactory.createXMLWriter( actual, charset );
 
-		final String namespaceURI = "https://www.example.com/";
+		var namespaceURI = "https://www.example.com/";
 		xmlWriter.startDocument();
 		xmlWriter.setPrefix( "ab", namespaceURI );
 		xmlWriter.startTag( namespaceURI, "test" );

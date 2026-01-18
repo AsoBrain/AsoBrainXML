@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,46 +26,45 @@ import javax.xml.stream.*;
  *
  * @author G. Meinders
  */
+@SuppressWarnings( "unused" )
 class StaxWriterFactory
 extends XMLWriterFactory
 {
 	/**
 	 * Factory used to created StAX writers.
 	 */
-	private final XMLOutputFactory _factory;
+	private final XMLOutputFactory factory;
 
-	/**
-	 * Constructs a new instance.
-	 */
-	public StaxWriterFactory()
+	@SuppressWarnings( "ErrorNotRethrown" )
+	StaxWriterFactory()
 	{
 		try
 		{
-			_factory = XMLOutputFactory.newFactory();
+			factory = XMLOutputFactory.newFactory();
 		}
-		catch ( final FactoryConfigurationError e )
+		catch ( FactoryConfigurationError e )
 		{
 			throw new FactoryException( e );
 		}
 	}
 
 	@Override
-	public XMLWriter createXMLWriter( final OutputStream out, final String encoding )
+	public XMLWriter createXMLWriter( OutputStream out, String encoding )
 	throws XMLException
 	{
 		XMLStreamWriter writer;
 		try
 		{
-			writer = _factory.createXMLStreamWriter( out, encoding );
+			writer = factory.createXMLStreamWriter( out, encoding );
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 
 		if ( isIndenting() )
 		{
-			final IndentingXMLStreamWriter indenting = new IndentingXMLStreamWriter( writer );
+			var indenting = new IndentingXMLStreamWriter( writer );
 			indenting.setNewline( getNewline() );
 			indenting.setIndent( getIndent() );
 			writer = indenting;
@@ -75,22 +74,22 @@ extends XMLWriterFactory
 	}
 
 	@Override
-	public XMLWriter createXMLWriter( final Writer writer, final String encoding )
+	public XMLWriter createXMLWriter( Writer writer, String encoding )
 	throws XMLException
 	{
 		XMLStreamWriter xmlStreamWriter;
 		try
 		{
-			xmlStreamWriter = _factory.createXMLStreamWriter( writer );
+			xmlStreamWriter = factory.createXMLStreamWriter( writer );
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 
 		if ( isIndenting() )
 		{
-			final IndentingXMLStreamWriter indenting = new IndentingXMLStreamWriter( xmlStreamWriter );
+			var indenting = new IndentingXMLStreamWriter( xmlStreamWriter );
 			indenting.setNewline( getNewline() );
 			indenting.setIndent( getIndent() );
 			xmlStreamWriter = indenting;

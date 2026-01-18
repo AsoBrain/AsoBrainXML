@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,82 +21,72 @@ package ab.xml;
 import java.util.*;
 import javax.xml.stream.*;
 
-import org.jetbrains.annotations.*;
+import lombok.*;
 
 /**
  * XML writer implementation that uses StAX, the Streaming API for XML.
  *
  * @author G. Meinders
  */
+@RequiredArgsConstructor
+@SuppressWarnings( "unused" )
 public class StaxWriter
-implements XMLWriter
+	implements XMLWriter
 {
 	/**
 	 * StAX writer to be used.
 	 */
-	private final XMLStreamWriter _writer;
+	private final XMLStreamWriter writer;
 
 	/**
 	 * Character encoding of the XML document.
 	 */
-	private final String _encoding;
+	private final String encoding;
 
 	/**
 	 * {@code true} if the writer is currently writing an empty tag.
 	 */
-	private boolean _empty = false;
+	private boolean empty = false;
 
 	/**
 	 * Namespace declarations that need to be added to the next start element.
 	 */
-	private final Collection<NamespaceDeclaration> _namespaces = new ArrayList<NamespaceDeclaration>();
-
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param writer   StAX writer to be used.
-	 * @param encoding Character encoding of the XML document.
-	 */
-	public StaxWriter( final XMLStreamWriter writer, final String encoding )
-	{
-		_writer = writer;
-		_encoding = encoding;
-	}
+	private final Collection<NamespaceDeclaration> namespaces = new ArrayList<>();
 
 	@Override
 	public void startDocument()
-	throws XMLException
+		throws XMLException
 	{
 		try
 		{
-			_writer.writeStartDocument( _encoding, "1.0" );
+			writer.writeStartDocument( encoding, "1.0" );
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
 	@Override
-	public void setPrefix( @NotNull final String prefix, @NotNull final String namespaceURI )
-	throws XMLException
+	public void setPrefix( String prefix, String namespaceURI )
+		throws XMLException
 	{
 		try
 		{
-			_writer.setPrefix( prefix, namespaceURI );
-			_namespaces.add( new NamespaceDeclaration( prefix, namespaceURI ) );
+			writer.setPrefix( prefix, namespaceURI );
+			namespaces.add( new NamespaceDeclaration( prefix, namespaceURI ) );
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
 	@Override
-	public void startTag( final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	public void startTag( String namespaceURI, String localName )
+		throws XMLException
 	{
-		if ( _empty )
+		if ( empty )
 		{
 			throw new XMLException( "Not allowed inside an empty tag. Use 'endTag' first." );
 		}
@@ -105,116 +95,115 @@ implements XMLWriter
 		{
 			if ( namespaceURI == null )
 			{
-				_writer.writeStartElement( localName );
+				writer.writeStartElement( localName );
 			}
 			else
 			{
-				_writer.writeStartElement( namespaceURI, localName );
+				writer.writeStartElement( namespaceURI, localName );
 			}
-			for ( final NamespaceDeclaration namespace : _namespaces )
+			for ( NamespaceDeclaration namespace : namespaces )
 			{
-				_writer.writeNamespace( namespace._prefix, namespace._namespaceURI );
+				writer.writeNamespace( namespace.prefix(), namespace.namespaceURI() );
 			}
-			_namespaces.clear();
+			namespaces.clear();
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
 	@Override
-	public void emptyTag( final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	public void emptyTag( String namespaceURI, String localName )
+		throws XMLException
 	{
 		try
 		{
 			if ( namespaceURI == null )
 			{
-				_writer.writeEmptyElement( localName );
+				writer.writeEmptyElement( localName );
 			}
 			else
 			{
-				_writer.writeEmptyElement( namespaceURI, localName );
+				writer.writeEmptyElement( namespaceURI, localName );
 			}
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
-		_empty = true;
+		empty = true;
 	}
 
 	@Override
-	public void attribute( final String namespaceURI, @NotNull final String localName, @NotNull final String value )
-	throws XMLException
+	public void attribute( String namespaceURI, String localName, String value )
+		throws XMLException
 	{
 		try
 		{
 			if ( namespaceURI == null )
 			{
-				_writer.writeAttribute( localName, value );
+				writer.writeAttribute( localName, value );
 			}
 			else
 			{
-				_writer.writeAttribute( namespaceURI, localName, value );
+				writer.writeAttribute( namespaceURI, localName, value );
 			}
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
 	@Override
-	public void text( @NotNull final String characters )
-	throws XMLException
+	public void text( String characters )
+		throws XMLException
 	{
-		if ( _empty )
+		if ( empty )
 		{
 			throw new XMLException( "Not allowed inside an empty tag. Use 'endTag' first." );
 		}
 
 		try
 		{
-			_writer.writeCharacters( characters );
+			writer.writeCharacters( characters );
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
 	@Override
-	public void endTag( final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	public void endTag( String namespaceURI, String localName )
+		throws XMLException
 	{
-		if ( _empty )
+		if ( empty )
 		{
-			_empty = false;
+			empty = false;
+			return;
 		}
-		else
+
+		try
 		{
-			try
-			{
-				_writer.writeEndElement();
-			}
-			catch ( final XMLStreamException e )
-			{
-				throw new XMLException( e );
-			}
+			writer.writeEndElement();
+		}
+		catch ( XMLStreamException e )
+		{
+			throw new XMLException( e );
 		}
 	}
 
 	@Override
 	public void endDocument()
-	throws XMLException
+		throws XMLException
 	{
 		try
 		{
-			_writer.writeEndDocument();
+			writer.writeEndDocument();
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
@@ -222,13 +211,13 @@ implements XMLWriter
 
 	@Override
 	public void flush()
-	throws XMLException
+		throws XMLException
 	{
 		try
 		{
-			_writer.flush();
+			writer.flush();
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
@@ -236,29 +225,11 @@ implements XMLWriter
 
 	/**
 	 * Namespace declaration.
+	 *
+	 * @param prefix       Prefix.
+	 * @param namespaceURI Namespace URI.
 	 */
-	private static class NamespaceDeclaration
+	private record NamespaceDeclaration( String prefix, String namespaceURI )
 	{
-		/**
-		 * Prefix.
-		 */
-		private final String _prefix;
-
-		/**
-		 * Namespace URI.
-		 */
-		private final String _namespaceURI;
-
-		/**
-		 * Constructs a new instance.
-		 *
-		 * @param prefix       Prefix.
-		 * @param namespaceURI Namespace URI.
-		 */
-		private NamespaceDeclaration( final String prefix, final String namespaceURI )
-		{
-			_prefix = prefix;
-			_namespaceURI = namespaceURI;
-		}
 	}
 }

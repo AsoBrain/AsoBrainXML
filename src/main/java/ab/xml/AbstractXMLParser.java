@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2021 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,45 +19,32 @@
 package ab.xml;
 
 import java.io.*;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
-import org.jetbrains.annotations.*;
+import org.jspecify.annotations.*;
 
 /**
  * Provides common functions needed to parse XML using a {@link XMLReader}.
  *
  * @author G. Meinders
  */
+@SuppressWarnings( { "unused", "AbstractClassNeverImplemented", "WeakerAccess" } )
 public abstract class AbstractXMLParser
 {
-	/**
-	 * XML reader.
-	 */
-	protected final XMLReader _reader;
+	protected final XMLReader reader;
 
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param in       Stream to read from.
-	 * @param encoding Character encoding.
-	 *
-	 * @throws XMLException if an XML-related exception occurs.
-	 */
-	protected AbstractXMLParser( @NotNull final InputStream in, @Nullable final String encoding )
-	throws XMLException
+	protected AbstractXMLParser( InputStream in, @Nullable String encoding )
+		throws XMLException
 	{
-		final XMLReaderFactory readerFactory = XMLReaderFactory.newInstance();
-		_reader = readerFactory.createXMLReader( in, encoding );
+		var readerFactory = XMLReaderFactory.newInstance();
+		reader = readerFactory.createXMLReader( in, encoding );
 	}
 
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param reader XML reader;
-	 */
-	protected AbstractXMLParser( @NotNull final XMLReader reader )
+	protected AbstractXMLParser( XMLReader reader )
 	{
-		_reader = reader;
+		this.reader = reader;
 	}
 
 	/**
@@ -66,21 +53,20 @@ public abstract class AbstractXMLParser
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
 	protected void skipElement()
-	throws XMLException
+		throws XMLException
 	{
 		require( XMLEventType.START_ELEMENT );
-		int depth = 1;
+		var depth = 1;
 		do
 		{
-			switch ( _reader.next() )
+			switch ( reader.next() )
 			{
-				case START_ELEMENT:
-					depth++;
-					break;
-
-				case END_ELEMENT:
-					depth--;
-					break;
+				case START_ELEMENT -> depth++;
+				case END_ELEMENT -> depth--;
+				default ->
+				{
+					// Other event types are ignored while skipping an element.
+				}
 			}
 		}
 		while ( depth > 0 );
@@ -92,28 +78,19 @@ public abstract class AbstractXMLParser
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
 	protected void skipWhitespace()
-	throws XMLException
+		throws XMLException
 	{
-		while ( _reader.getEventType() == XMLEventType.CHARACTERS )
+		while ( reader.getEventType() == XMLEventType.CHARACTERS )
 		{
-			final String text = _reader.getText();
+			var text = reader.getText();
 
-			boolean empty = true;
-			for ( int i = 0; i < text.length(); i++ )
-			{
-				if ( !Character.isWhitespace( text.charAt( i ) ) )
-				{
-					empty = false;
-					break;
-				}
-			}
-
+			var empty = IntStream.range( 0, text.length() ).allMatch( i -> Character.isWhitespace( text.charAt( i ) ) );
 			if ( !empty )
 			{
 				break;
 			}
 
-			_reader.next();
+			reader.next();
 		}
 	}
 
@@ -125,13 +102,13 @@ public abstract class AbstractXMLParser
 	 *
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
-	protected void require( @NotNull final XMLEventType eventType )
-	throws XMLException
+	protected void require( XMLEventType eventType )
+		throws XMLException
 	{
-		if ( ( eventType != _reader.getEventType() ) )
+		if ( ( eventType != reader.getEventType() ) )
 		{
-			final String eventQName = getQName();
-			throw new XMLException( "Expected " + eventType + ", but was " + _reader.getEventType() + ( eventQName == null ? "" : ' ' + eventQName ) );
+			var eventQName = getQName();
+			throw new XMLException( "Expected %s, but was %s%s".formatted( eventType, reader.getEventType(), eventQName == null ? "" : ' ' + eventQName ) );
 		}
 	}
 
@@ -145,14 +122,14 @@ public abstract class AbstractXMLParser
 	 *
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
-	protected void require( @NotNull final XMLEventType eventType, @Nullable final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	protected void require( XMLEventType eventType, @Nullable String namespaceURI, String localName )
+		throws XMLException
 	{
-		if ( ( eventType != _reader.getEventType() ) ||
+		if ( ( eventType != reader.getEventType() ) ||
 		     !matches( namespaceURI, localName ) )
 		{
-			final String eventQName = getQName();
-			throw new XMLException( "Expected " + eventType + ' ' + getQName( namespaceURI, localName ) + ", but was " + _reader.getEventType() + ( eventQName == null ? "" : ' ' + eventQName ) );
+			var eventQName = getQName();
+			throw new XMLException( "Expected %s %s, but was %s%s".formatted( eventType, getQName( namespaceURI, localName ), reader.getEventType(), eventQName == null ? "" : ' ' + eventQName ) );
 		}
 	}
 
@@ -165,13 +142,13 @@ public abstract class AbstractXMLParser
 	 *
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
-	protected void require( @NotNull final XMLEventType eventType, @NotNull final String localName )
-	throws XMLException
+	protected void require( XMLEventType eventType, String localName )
+		throws XMLException
 	{
-		if ( ( eventType != _reader.getEventType() ) || !matches( localName ) )
+		if ( ( eventType != reader.getEventType() ) || !matches( localName ) )
 		{
-			final String eventQName = getQName();
-			throw new XMLException( "Expected " + eventType + ' ' + localName + ", but was " + _reader.getEventType() + ( eventQName == null ? "" : ' ' + eventQName ) );
+			var eventQName = getQName();
+			throw new XMLException( "Expected %s %s, but was %s%s".formatted( eventType, localName, reader.getEventType(), eventQName == null ? "" : ' ' + eventQName ) );
 		}
 	}
 
@@ -182,13 +159,13 @@ public abstract class AbstractXMLParser
 	 * @param eventType Event type.
 	 *
 	 * @throws XMLException if the token does not match, or another XML-related
-	 *                      exception occurs.
+	 * exception occurs.
 	 */
-	protected void accept( @NotNull final XMLEventType eventType )
-	throws XMLException
+	protected void accept( XMLEventType eventType )
+		throws XMLException
 	{
 		require( eventType );
-		_reader.next();
+		reader.next();
 	}
 
 	/**
@@ -201,13 +178,13 @@ public abstract class AbstractXMLParser
 	 * @param localName    Local name.
 	 *
 	 * @throws XMLException if the token does not match, or another XML-related
-	 *                      exception occurs.
+	 * exception occurs.
 	 */
-	protected void accept( @NotNull final XMLEventType eventType, @Nullable final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	protected void accept( XMLEventType eventType, @Nullable String namespaceURI, String localName )
+		throws XMLException
 	{
 		require( eventType, namespaceURI, localName );
-		_reader.next();
+		reader.next();
 	}
 
 	/**
@@ -216,10 +193,10 @@ public abstract class AbstractXMLParser
 	 * @throws XMLException to indicate the current token is unexpected.
 	 */
 	protected void unexpected()
-	throws XMLException
+		throws XMLException
 	{
-		final String eventQName = getQName();
-		throw new XMLException( "Unexpected " + _reader.getEventType() + ( eventQName == null ? "" : " " + eventQName ) );
+		var eventQName = getQName();
+		throw new XMLException( "Unexpected %s%s".formatted( reader.getEventType(), eventQName == null ? "" : " " + eventQName ) );
 	}
 
 	/**
@@ -230,18 +207,16 @@ public abstract class AbstractXMLParser
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
 	protected boolean nextElement()
-	throws XMLException
+		throws XMLException
 	{
-		boolean result = false;
-		while ( _reader.next() != XMLEventType.END_ELEMENT )
+		while ( reader.next() != XMLEventType.END_ELEMENT )
 		{
-			if ( _reader.getEventType() == XMLEventType.START_ELEMENT )
+			if ( reader.getEventType() == XMLEventType.START_ELEMENT )
 			{
-				result = true;
-				break;
+				return true;
 			}
 		}
-		return result;
+		return false;
 	}
 
 	/**
@@ -252,9 +227,9 @@ public abstract class AbstractXMLParser
 	 *
 	 * @return {@code true} if the event matches.
 	 */
-	protected boolean matches( @NotNull final String localName )
+	protected boolean matches( String localName )
 	{
-		return localName.equals( _reader.getLocalName() );
+		return localName.equals( reader.getLocalName() );
 	}
 
 	/**
@@ -266,11 +241,11 @@ public abstract class AbstractXMLParser
 	 *
 	 * @return {@code true} if the event matches.
 	 */
-	protected boolean matches( @Nullable final String namespaceURI, @NotNull final String localName )
+	protected boolean matches( @Nullable String namespaceURI, String localName )
 	{
-		final String readNamespaceURI = _reader.getNamespaceURI();
-		final String readLocalName = _reader.getLocalName();
-		return ( namespaceURI != null ? namespaceURI.equals( readNamespaceURI ) : readNamespaceURI == null ) && localName.equals( readLocalName );
+		var readNamespaceURI = reader.getNamespaceURI();
+		var readLocalName = reader.getLocalName();
+		return ( Objects.equals( namespaceURI, readNamespaceURI ) ) && localName.equals( readLocalName );
 	}
 
 	/**
@@ -282,9 +257,9 @@ public abstract class AbstractXMLParser
 	 *
 	 * @return Qualified name.
 	 */
-	protected String getQName( @Nullable final String namespaceURI, final String localName )
+	protected String getQName( @Nullable String namespaceURI, String localName )
 	{
-		return namespaceURI == null ? localName : '{' + namespaceURI + "}:" + localName;
+		return namespaceURI == null ? localName : "{%s}:%s".formatted( namespaceURI, localName );
 	}
 
 	/**
@@ -292,24 +267,13 @@ public abstract class AbstractXMLParser
 	 *
 	 * @return Qualified name; {@code null} if not applicable.
 	 */
-	@Nullable
-	protected String getQName()
+	protected @Nullable String getQName()
 	{
-		final String result;
-
-		switch ( _reader.getEventType() )
+		return switch ( reader.getEventType() )
 		{
-			case START_ELEMENT:
-			case END_ELEMENT:
-				result = getQName( _reader.getNamespaceURI(), _reader.getLocalName() );
-				break;
-
-			default:
-				result = null;
-				break;
-		}
-
-		return result;
+			case START_ELEMENT, END_ELEMENT -> getQName( reader.getNamespaceURI(), reader.getLocalName() );
+			default -> null;
+		};
 	}
 
 	/**
@@ -319,7 +283,7 @@ public abstract class AbstractXMLParser
 	 *
 	 * @return Whether the attribute is set.
 	 */
-	protected boolean isAttributeSet( @NotNull final String localName )
+	protected boolean isAttributeSet( String localName )
 	{
 		return isAttributeSet( null, localName );
 	}
@@ -332,9 +296,9 @@ public abstract class AbstractXMLParser
 	 *
 	 * @return Whether the attribute is set.
 	 */
-	protected boolean isAttributeSet( @Nullable final String namespaceURI, @NotNull final String localName )
+	protected boolean isAttributeSet( @Nullable String namespaceURI, String localName )
 	{
-		return _reader.getAttributeValue( namespaceURI, localName ) != null;
+		return reader.getAttributeValue( namespaceURI, localName ) != null;
 	}
 
 	/**
@@ -347,9 +311,8 @@ public abstract class AbstractXMLParser
 	 *
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
-	@NotNull
-	protected String parseAttribute( @NotNull final String localName )
-	throws XMLException
+	protected String parseAttribute( String localName )
+		throws XMLException
 	{
 		return parseAttribute( null, localName );
 	}
@@ -365,14 +328,13 @@ public abstract class AbstractXMLParser
 	 *
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
-	@NotNull
-	protected String parseAttribute( @Nullable final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	protected String parseAttribute( @Nullable String namespaceURI, String localName )
+		throws XMLException
 	{
-		final String result = _reader.getAttributeValue( namespaceURI, localName );
+		var result = reader.getAttributeValue( namespaceURI, localName );
 		if ( result == null )
 		{
-			throw new XMLException( "Missing required attribute '" + localName + "' of element " + getQName() + '.' );
+			throw new XMLException( "Missing required attribute '%s' of element %s.".formatted( localName, getQName() ) );
 		}
 		return result;
 	}
@@ -387,8 +349,8 @@ public abstract class AbstractXMLParser
 	 *
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
-	protected double parseDoubleAttribute( @NotNull final String localName )
-	throws XMLException
+	protected double parseDoubleAttribute( String localName )
+		throws XMLException
 	{
 		return parseDoubleAttribute( null, localName );
 	}
@@ -404,17 +366,17 @@ public abstract class AbstractXMLParser
 	 *
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
-	protected double parseDoubleAttribute( @Nullable final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	protected double parseDoubleAttribute( @Nullable String namespaceURI, String localName )
+		throws XMLException
 	{
-		final String value = parseAttribute( namespaceURI, localName );
+		var value = parseAttribute( namespaceURI, localName );
 		try
 		{
 			return Double.parseDouble( value );
 		}
-		catch ( final NumberFormatException ignored )
+		catch ( NumberFormatException ignored )
 		{
-			throw new XMLException( "Invalid value for attribute '" + localName + "': " + value );
+			throw new XMLException( "Invalid value for attribute '%s': %s".formatted( localName, value ) );
 		}
 	}
 
@@ -428,8 +390,8 @@ public abstract class AbstractXMLParser
 	 *
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
-	protected int parseIntegerAttribute( @NotNull final String localName )
-	throws XMLException
+	protected int parseIntegerAttribute( String localName )
+		throws XMLException
 	{
 		return parseIntegerAttribute( null, localName );
 	}
@@ -445,17 +407,17 @@ public abstract class AbstractXMLParser
 	 *
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
-	protected int parseIntegerAttribute( @Nullable final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	protected int parseIntegerAttribute( @Nullable String namespaceURI, String localName )
+		throws XMLException
 	{
-		final String value = parseAttribute( namespaceURI, localName );
+		var value = parseAttribute( namespaceURI, localName );
 		try
 		{
 			return Integer.parseInt( value );
 		}
-		catch ( final NumberFormatException ignored )
+		catch ( NumberFormatException ignored )
 		{
-			throw new XMLException( "Invalid value for attribute '" + localName + "': " + value );
+			throw new XMLException( "Invalid value for attribute '%s': %s".formatted( localName, value ) );
 		}
 	}
 
@@ -466,23 +428,22 @@ public abstract class AbstractXMLParser
 	 *
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
-	protected void parseList( final Consumer<String> consumer )
-	throws XMLException
+	protected void parseList( Consumer<String> consumer )
+		throws XMLException
 	{
-		final StringBuilder builder = new StringBuilder();
+		var builder = new StringBuilder();
 
-		int fromIndex = 0;
-		while ( _reader.getEventType() == XMLEventType.CHARACTERS )
+		var fromIndex = 0;
+		while ( reader.getEventType() == XMLEventType.CHARACTERS )
 		{
 			builder.delete( 0, fromIndex );
-			builder.append( _reader.getText() );
-
-			int toIndex;
+			builder.append( reader.getText() );
 
 			while ( true )
 			{
-				// TODO: Other whitespace could be used as well, not just the space character (\u0020).
-				toIndex = builder.indexOf( " ", fromIndex );
+				var toIndex = IntStream.range( fromIndex, builder.length() )
+				                       .filter( i -> Character.isWhitespace( builder.charAt( i ) ) )
+				                       .findFirst().orElse( -1 );
 				if ( toIndex == -1 )
 				{
 					break;
@@ -496,7 +457,7 @@ public abstract class AbstractXMLParser
 				fromIndex = toIndex + 1;
 			}
 
-			_reader.next();
+			reader.next();
 		}
 
 		if ( builder.length() > fromIndex )
@@ -513,14 +474,14 @@ public abstract class AbstractXMLParser
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
 	protected String parseTextContent()
-	throws XMLException
+		throws XMLException
 	{
-		final StringBuilder builder = new StringBuilder();
+		var builder = new StringBuilder();
 
-		while ( _reader.getEventType() == XMLEventType.CHARACTERS )
+		while ( reader.getEventType() == XMLEventType.CHARACTERS )
 		{
-			builder.append( _reader.getText() );
-			_reader.next();
+			builder.append( reader.getText() );
+			reader.next();
 		}
 
 		return builder.toString();

@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2022 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,8 @@ package ab.xml;
 
 import java.io.*;
 
-import org.jetbrains.annotations.*;
+import lombok.*;
+import org.jspecify.annotations.*;
 import org.xmlpull.v1.*;
 
 /**
@@ -29,159 +30,91 @@ import org.xmlpull.v1.*;
  *
  * @author Gerrit Meinders
  */
+@RequiredArgsConstructor
 class XmlPullReader
-implements XMLReader
+	implements XMLReader
 {
 	/**
 	 * XML Pull parser to be used.
 	 */
-	@NotNull
-	private final XmlPullParser _parser;
+	private final XmlPullParser parser;
 
 	/**
 	 * Event type returned by the last call to {@link #next()}.
 	 */
-	@NotNull
-	private XMLEventType _eventType;
+	private XMLEventType eventType = XMLEventType.START_DOCUMENT;
 
 	/**
 	 * Target of the current processing instruction, if any.
 	 */
-	@Nullable
-	private String _piTarget;
+	private @Nullable String piTarget = null;
 
 	/**
 	 * Data of the current processing instruction, if any.
 	 */
-	@Nullable
-	private String _piData;
+	private @Nullable String piData = null;
 
 	/**
 	 * Text content of the current character data event. If set, the state of
 	 * the underlying parser should be ignored and a character data event with
 	 * the content of this string should be reported instead.
 	 */
-	@Nullable
-	private String _characterData;
+	private @Nullable String characterData = null;
 
 	/**
 	 * Used to coalesce consecutive character data that is returned as separate
 	 * events by {@link XmlPullParser#nextToken()}.
 	 */
 	@SuppressWarnings( "StringBufferField" )
-	@NotNull
-	private final StringBuilder _characterDataBuilder;
-
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param parser XML Pull parser to be used.
-	 */
-	XmlPullReader( @NotNull final XmlPullParser parser )
-	{
-		_parser = parser;
-		_eventType = XMLEventType.START_DOCUMENT;
-		_piTarget = null;
-		_piData = null;
-		_characterData = null;
-		_characterDataBuilder = new StringBuilder();
-	}
+	private final StringBuilder characterDataBuilder = new StringBuilder();
 
 	@Override
-	@NotNull
 	public XMLEventType getEventType()
 	{
-		return _eventType;
+		return eventType;
 	}
 
 	@Override
-	@NotNull
 	public XMLEventType next()
-	throws XMLException
+		throws XMLException
 	{
-		if ( _eventType == XMLEventType.END_DOCUMENT )
+		if ( eventType == XMLEventType.END_DOCUMENT )
 		{
-			throw new IllegalStateException( "Not allowed after " + XMLEventType.END_DOCUMENT + " event." );
+			throw new IllegalStateException( "Not allowed after %s event.".formatted( XMLEventType.END_DOCUMENT ) );
 		}
 
 		XMLEventType result;
 		do
 		{
-			final int token;
-			try
+			int token;
+			if ( characterData == null )
 			{
-				if ( _characterData == null )
-				{
-					try
-					{
-						token = _parser.nextToken();
-					}
-					catch ( final IOException e )
-					{
-						throw new XMLException( e );
-					}
-				}
-				else
-				{
-					token = _parser.getEventType();
-					_characterData = null;
-				}
+				token = parseNextToken();
 			}
-			catch ( final XmlPullParserException e )
+			else
 			{
-				throw new XMLException( e );
+				token = getParsedEventType();
+				characterData = null;
 			}
 
-			switch ( token )
+			result = switch ( token )
 			{
-				case XmlPullParser.START_DOCUMENT:
-					result = XMLEventType.START_DOCUMENT;
-					break;
-
-				case XmlPullParser.END_DOCUMENT:
-					result = XMLEventType.END_DOCUMENT;
-					break;
-
-				case XmlPullParser.START_TAG:
-					result = XMLEventType.START_ELEMENT;
-					break;
-
-				case XmlPullParser.END_TAG:
-					result = XMLEventType.END_ELEMENT;
-					break;
-
-				case XmlPullParser.TEXT:
-				case XmlPullParser.CDSECT:
-					result = XMLEventType.CHARACTERS;
-					break;
-
-				case XmlPullParser.ENTITY_REF:
-					result = XMLEventType.CHARACTERS;
-					break;
-
-				case XmlPullParser.IGNORABLE_WHITESPACE:
-					result = null;
-					break;
-
-				case XmlPullParser.PROCESSING_INSTRUCTION:
-					result = XMLEventType.PROCESSING_INSTRUCTION;
-					break;
-
-				case XmlPullParser.COMMENT:
-					result = null;
-					break;
-
-				case XmlPullParser.DOCDECL:
-					result = XMLEventType.DTD;
-					break;
-
-				default:
-					throw new XMLException( "Unknown token: " + token );
-			}
+				case XmlPullParser.START_DOCUMENT -> XMLEventType.START_DOCUMENT;
+				case XmlPullParser.END_DOCUMENT -> XMLEventType.END_DOCUMENT;
+				case XmlPullParser.START_TAG -> XMLEventType.START_ELEMENT;
+				case XmlPullParser.END_TAG -> XMLEventType.END_ELEMENT;
+				case XmlPullParser.TEXT,
+				     XmlPullParser.CDSECT,
+				     XmlPullParser.ENTITY_REF -> XMLEventType.CHARACTERS;
+				case XmlPullParser.IGNORABLE_WHITESPACE, XmlPullParser.COMMENT -> null;
+				case XmlPullParser.PROCESSING_INSTRUCTION -> XMLEventType.PROCESSING_INSTRUCTION;
+				case XmlPullParser.DOCDECL -> XMLEventType.DTD;
+				default -> throw new XMLException( "Unknown token: " + token );
+			};
 		}
 		while ( result == null );
 
-		_eventType = result;
+		eventType = result;
 		updateProcessingInstructionFields();
 
 		if ( result == XMLEventType.CHARACTERS )
@@ -192,56 +125,79 @@ implements XMLReader
 		return result;
 	}
 
+	private int parseNextToken()
+		throws XMLException
+	{
+		try
+		{
+			return parser.nextToken();
+		}
+		catch ( IOException | XmlPullParserException e )
+		{
+			throw new XMLException( e );
+		}
+	}
+
+	private int getParsedEventType()
+		throws XMLException
+	{
+		try
+		{
+			return parser.getEventType();
+		}
+		catch ( XmlPullParserException e )
+		{
+			throw new XMLException( e );
+		}
+	}
+
 	/**
-	 * Updates the {@link #_piTarget} and {@link #_piData} fields. Must be
-	 * called after {@link #_eventType} is updated.
+	 * Updates the {@link #piTarget} and {@link #piData} fields. Must be
+	 * called after {@link #eventType} is updated.
 	 */
 	private void updateProcessingInstructionFields()
 	{
-		String piTarget = null;
-		String piData = null;
-
-		if ( _eventType == XMLEventType.PROCESSING_INSTRUCTION )
+		if ( eventType != XMLEventType.PROCESSING_INSTRUCTION )
 		{
-			final String text = _parser.getText();
-			final int length = text.length();
-
-			int targetEnd = 1;
-			while ( targetEnd < length )
-			{
-				final char c = text.charAt( targetEnd );
-				if ( ( c == ' ' ) || ( c == '\t' ) || ( c == '\r' ) || ( c == '\n' ) )
-				{
-					break;
-				}
-				targetEnd++;
-			}
-
-			if ( targetEnd == length )
-			{
-				piTarget = text;
-				piData = "";
-			}
-			else
-			{
-				int dataStart = targetEnd + 1;
-				while ( dataStart < length )
-				{
-					final char c = text.charAt( dataStart );
-					if ( ( c != ' ' ) && ( c != '\t' ) && ( c != '\r' ) && ( c != '\n' ) )
-					{
-						break;
-					}
-					dataStart++;
-				}
-
-				piTarget = text.substring( 0, targetEnd );
-				piData = text.substring( dataStart );
-			}
+			piTarget = null;
+			piData = null;
+			return;
 		}
 
-		_piTarget = piTarget;
-		_piData = piData;
+		var text = parser.getText();
+		var length = text.length();
+
+		var targetEnd = 1;
+		while ( targetEnd < length )
+		{
+			var c = text.charAt( targetEnd );
+			if ( c == ' ' || c == '\t' || c == '\r' || c == '\n' )
+			{
+				break;
+			}
+			targetEnd++;
+		}
+
+		if ( targetEnd == length )
+		{
+			piTarget = text;
+			piData = "";
+			return;
+		}
+
+		var dataStart = targetEnd + 1;
+		while ( dataStart < length )
+		{
+			var c = text.charAt( dataStart );
+			if ( c != ' ' && c != '\t' && c != '\r' && c != '\n' )
+			{
+				break;
+			}
+			dataStart++;
+		}
+
+		piTarget = text.substring( 0, targetEnd );
+		piData = text.substring( dataStart );
 	}
 
 	/**
@@ -251,210 +207,187 @@ implements XMLReader
 	 * @throws XMLException if an XML-related exception occurs.
 	 */
 	private void coalesceCharacterData()
-	throws XMLException
+		throws XMLException
 	{
-		final StringBuilder builder = _characterDataBuilder;
-		builder.append( _parser.getText() );
-		try
+		var builder = characterDataBuilder;
+		builder.append( parser.getText() );
+		while ( true )
 		{
-			while ( true )
+			var token = parseNextToken();
+			if ( token == XmlPullParser.TEXT ||
+			     token == XmlPullParser.CDSECT ||
+			     token == XmlPullParser.ENTITY_REF )
 			{
-				final int token = _parser.nextToken();
-				if ( ( token == XmlPullParser.TEXT ) ||
-				     ( token == XmlPullParser.CDSECT ) ||
-				     ( token == XmlPullParser.ENTITY_REF ) )
-				{
-					builder.append( _parser.getText() );
-				}
-				else
-				{
-					break;
-				}
+				builder.append( parser.getText() );
+			}
+			else
+			{
+				break;
 			}
 		}
-		catch ( final XmlPullParserException e )
-		{
-			throw new XMLException( e );
-		}
-		catch ( final IOException e )
-		{
-			throw new XMLException( e );
-		}
 
-		_characterData = builder.toString();
-		_characterDataBuilder.setLength( 0 );
+		characterData = builder.toString();
+		characterDataBuilder.setLength( 0 );
 	}
 
 	@Override
 	public String getNamespaceURI()
 	{
-		final XMLEventType eventType = _eventType;
-		if ( ( eventType != XMLEventType.START_ELEMENT ) &&
-		     ( eventType != XMLEventType.END_ELEMENT ) )
+		if ( eventType != XMLEventType.START_ELEMENT &&
+		     eventType != XMLEventType.END_ELEMENT )
 		{
 			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return _parser.getNamespace( _parser.getPrefix() );
+		return parser.getNamespace( parser.getPrefix() );
 	}
 
 	@Override
-	@NotNull
 	public String getLocalName()
 	{
-		final XMLEventType eventType = _eventType;
-		if ( ( eventType != XMLEventType.START_ELEMENT ) &&
-		     ( eventType != XMLEventType.END_ELEMENT ) )
+		if ( eventType != XMLEventType.START_ELEMENT &&
+		     eventType != XMLEventType.END_ELEMENT )
 		{
 			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return _parser.getName();
+		return parser.getName();
 	}
 
 	@Override
 	public int getAttributeCount()
 	{
-		if ( _eventType != XMLEventType.START_ELEMENT )
-		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
-		}
-
-		return _parser.getAttributeCount();
-	}
-
-	@Override
-	public String getAttributeNamespaceURI( final int index )
-	{
-		if ( _eventType != XMLEventType.START_ELEMENT )
-		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
-		}
-
-		if ( ( index < 0 ) || ( index >= getAttributeCount() ) )
-		{
-			throw new IndexOutOfBoundsException( index + " (attributeCount: " + getAttributeCount() + ')' );
-		}
-
-		return ( _parser.getAttributePrefix( index ) == null ) ? null : _parser.getAttributeNamespace( index );
-	}
-
-	@Override
-	@NotNull
-	public String getAttributeLocalName( final int index )
-	{
-		if ( _eventType != XMLEventType.START_ELEMENT )
-		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
-		}
-
-		if ( ( index < 0 ) || ( index >= getAttributeCount() ) )
-		{
-			throw new IndexOutOfBoundsException( index + " (attributeCount: " + getAttributeCount() + ')' );
-		}
-
-		return _parser.getAttributeName( index );
-	}
-
-	@Override
-	@NotNull
-	public String getAttributeValue( final int index )
-	{
-		if ( _eventType != XMLEventType.START_ELEMENT )
-		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
-		}
-
-		if ( ( index < 0 ) || ( index >= getAttributeCount() ) )
-		{
-			throw new IndexOutOfBoundsException( index + " (attributeCount: " + getAttributeCount() + ')' );
-		}
-
-		return _parser.getAttributeValue( index );
-	}
-
-	@Override
-	public String getAttributeValue( @NotNull final String localName )
-	{
-		final XMLEventType eventType = _eventType;
 		if ( eventType != XMLEventType.START_ELEMENT )
 		{
 			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		String result = null;
+		return parser.getAttributeCount();
+	}
 
-		final int attributeCount = _parser.getAttributeCount();
-		for ( int i = 0; i < attributeCount; i++ )
+	@Override
+	public String getAttributeNamespaceURI( int index )
+	{
+		if ( eventType != XMLEventType.START_ELEMENT )
 		{
-			if ( localName.equals( _parser.getAttributeName( i ) ) )
+			throw new IllegalStateException( "Not allowed for " + eventType );
+		}
+
+		if ( index < 0 || index >= getAttributeCount() )
+		{
+			throw new IndexOutOfBoundsException( index + " (attributeCount: " + getAttributeCount() + ')' );
+		}
+
+		return parser.getAttributePrefix( index ) == null ? null : parser.getAttributeNamespace( index );
+	}
+
+	@Override
+	public String getAttributeLocalName( int index )
+	{
+		if ( eventType != XMLEventType.START_ELEMENT )
+		{
+			throw new IllegalStateException( "Not allowed for " + eventType );
+		}
+
+		if ( index < 0 || index >= getAttributeCount() )
+		{
+			throw new IndexOutOfBoundsException( index + " (attributeCount: " + getAttributeCount() + ')' );
+		}
+
+		return parser.getAttributeName( index );
+	}
+
+	@Override
+	public String getAttributeValue( int index )
+	{
+		if ( eventType != XMLEventType.START_ELEMENT )
+		{
+			throw new IllegalStateException( "Not allowed for " + eventType );
+		}
+
+		if ( index < 0 || index >= getAttributeCount() )
+		{
+			throw new IndexOutOfBoundsException( index + " (attributeCount: " + getAttributeCount() + ')' );
+		}
+
+		return parser.getAttributeValue( index );
+	}
+
+	@Override
+	public String getAttributeValue( String localName )
+	{
+		if ( eventType != XMLEventType.START_ELEMENT )
+		{
+			throw new IllegalStateException( "Not allowed for " + eventType );
+		}
+
+		var attributeCount = parser.getAttributeCount();
+		for ( var i = 0; i < attributeCount; i++ )
+		{
+			if ( localName.equals( parser.getAttributeName( i ) ) )
 			{
-				result = _parser.getAttributeValue( i );
-				break;
+				return parser.getAttributeValue( i );
 			}
 		}
 
-		return result;
+		return null;
 	}
 
 	@Override
-	public String getAttributeValue( final String namespaceURI, @NotNull final String localName )
+	public String getAttributeValue( String namespaceURI, String localName )
 	{
-		if ( _eventType != XMLEventType.START_ELEMENT )
+		if ( eventType != XMLEventType.START_ELEMENT )
 		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
+			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return _parser.getAttributeValue( namespaceURI, localName );
+		return parser.getAttributeValue( namespaceURI, localName );
 	}
 
 	@Override
-	@NotNull
 	public String getText()
 	{
-		if ( _eventType != XMLEventType.CHARACTERS )
+		if ( eventType != XMLEventType.CHARACTERS )
 		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
+			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return ( _characterData != null ) ? _characterData : _parser.getText();
+		return characterData != null ? characterData : parser.getText();
 	}
 
 	@Override
-	@NotNull
 	public String getPITarget()
 	{
-		if ( _eventType != XMLEventType.PROCESSING_INSTRUCTION )
+		if ( eventType != XMLEventType.PROCESSING_INSTRUCTION )
 		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
+			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
 		// noinspection ConstantConditions
-		return _piTarget;
+		return piTarget;
 	}
 
 	@Override
-	@NotNull
 	public String getPIData()
 	{
-		if ( _eventType != XMLEventType.PROCESSING_INSTRUCTION )
+		if ( eventType != XMLEventType.PROCESSING_INSTRUCTION )
 		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
+			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
 		// noinspection ConstantConditions
-		return _piData;
+		return piData;
 	}
 
 	@Override
 	public int getLineNumber()
 	{
-		return _parser.getLineNumber();
+		return parser.getLineNumber();
 	}
 
 	@Override
 	public int getColumnNumber()
 	{
-		return _parser.getColumnNumber();
+		return parser.getColumnNumber();
 	}
 }

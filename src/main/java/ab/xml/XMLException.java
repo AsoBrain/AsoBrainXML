@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,51 +18,34 @@
  */
 package ab.xml;
 
+import java.io.*;
+
+import lombok.*;
+
 /**
  * Indicates that an XML-related operation cannot be completed.
  *
  * @author G. Meinders
  */
+@NoArgsConstructor
+@SuppressWarnings( "unused" )
 public class XMLException
 extends Exception
 {
-	/** Serialized data version. */
+	@Serial
 	private static final long serialVersionUID = 2576150199808703846L;
 
-	/**
-	 * Constructs a new instance.
-	 */
-	public XMLException()
-	{
-	}
-
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param message Detail message.
-	 */
-	public XMLException( final String message )
+	public XMLException( String message )
 	{
 		super( message );
 	}
 
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param message Detail message.
-	 * @param cause   Cause of the exception.
-	 */
-	public XMLException( final String message, final Throwable cause )
+	public XMLException( String message, Throwable cause )
 	{
 		super( message, cause );
 	}
 
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param cause Cause of the exception.
-	 */
-	public XMLException( final Throwable cause )
+	public XMLException( Throwable cause )
 	{
 		super( cause.getMessage(), cause );
 	}

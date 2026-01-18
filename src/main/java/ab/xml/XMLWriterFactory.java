@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,9 @@ package ab.xml;
 
 import java.io.*;
 
+import lombok.*;
+import org.jspecify.annotations.*;
+
 /**
  * Factory for creating {@link XMLWriter} instances using an XML API that is
  * available on the current platform.
@@ -34,195 +37,74 @@ import java.io.*;
  *
  * @author G. Meinders
  */
+@SuppressWarnings( "unused" )
+@Getter
+@Setter
 public abstract class XMLWriterFactory
 {
 	/**
 	 * Class names of factory implementations.
 	 */
-	@SuppressWarnings( "SpellCheckingInspection" )
 	private static final String[] FACTORY_CLASS_NAMES =
-	{
-	"ab.xml.XmlPullWriterFactory",
-	"ab.xml.StaxWriterFactory"
-	};
+		{
+			"ab.xml.XmlPullWriterFactory",
+			"ab.xml.StaxWriterFactory"
+		};
 
-	/**
-	 * Create a new factory that uses an XML API that is available on the
-	 * current platform.
-	 *
-	 * @return Factory instance.
-	 *
-	 * @throws FactoryException if no factory can be loaded.
-	 */
 	public static XMLWriterFactory newInstance()
 	{
-		XMLWriterFactory result = null;
-
-		for ( final String className : FACTORY_CLASS_NAMES )
+		for ( var className : FACTORY_CLASS_NAMES )
 		{
-			try
+			var factory = newFactory( className );
+			if ( factory != null )
 			{
-				//noinspection unchecked
-				final Class<XMLWriterFactory> clazz = (Class<XMLWriterFactory>)Class.forName( className );
-				//noinspection JavaReflectionMemberAccess
-				result = clazz.getConstructor().newInstance();
-				break;
-			}
-			catch ( final FactoryException e )
-			{
-				// Factory determined a problem. Use another factory.
-			}
-			catch ( final NoClassDefFoundError e )
-			{
-				// If the underlying API is not available.
-			}
-			catch ( final ClassNotFoundException e )
-			{
-				/*
-				 * If the factory class doesn't exist.
-				 * If so, the list of factory classes should be corrected.
-				 */
-				throw new FactoryException( e );
-			}
-			catch ( final IllegalAccessException e )
-			{
-				/*
-				 * If the factory class doesn't have a public constructor.
-				 * If so, the factory class should be corrected.
-				 */
-				throw new FactoryException( e );
-			}
-			catch ( final Throwable e )
-			{
-				/*
-				 * Any other problem with the factory probably indicates a
-				 * programming error as well.
-				 */
-				throw new FactoryException( e );
+				return factory;
 			}
 		}
 
-		if ( result == null )
-		{
-			throw new FactoryException( "Could not find an implementation that is supported by the current platform." );
-		}
+		throw new FactoryException( "Could not find an implementation that is supported by the current platform." );
+	}
 
-		return result;
+	@SuppressWarnings( { "ErrorNotRethrown", "squid:S1181" } )
+	private static @Nullable XMLWriterFactory newFactory( String className )
+	{
+		try
+		{
+			return ( (Class<XMLWriterFactory>)Class.forName( className ) ).getConstructor().newInstance();
+		}
+		catch ( FactoryException | NoClassDefFoundError e )
+		{
+			// FactoryException if factory determined a problem. Use another factory.
+			// NoClassDefFoundError if the underlying API is not available.
+			return null;
+		}
+		catch ( Throwable e )
+		{
+			// ClassNotFoundException if the factory class doesn't exist. If so, the list of factory classes should be corrected.
+			// IllegalAccessException: If the factory class doesn't have a public constructor. If so, the factory class should be corrected.
+			throw new FactoryException( e );
+		}
 	}
 
 	/**
 	 * Whether XML writers created by the factory should automatically indent
 	 * the written XML. Indenting is off by default.
 	 */
-	private boolean _indenting;
+	private boolean indenting = false;
 
 	/**
 	 * String inserted as a newline.
 	 */
-	private String _newline = "\n";
+	private String newline = "\n";
 
 	/**
 	 * String inserted for each level of indenting.
 	 */
-	private String _indent = "\t";
+	private String indent = "\t";
 
-	/**
-	 * Constructs a new factory instance.
-	 */
-	protected XMLWriterFactory()
-	{
-		_indenting = false;
-	}
+	public abstract XMLWriter createXMLWriter( OutputStream out, String encoding )
+		throws XMLException;
 
-	/**
-	 * Returns whether XML writers created by the factory should automatically
-	 * indent the written XML. Indenting is disabled by default.
-	 *
-	 * @return {@code true} if indenting is enabled.
-	 */
-	public boolean isIndenting()
-	{
-		return _indenting;
-	}
-
-	/**
-	 * Sets whether XML writers created by the factory should automatically
-	 * indent the written XML. Indenting is disabled by default.
-	 *
-	 * @param indenting {@code true} to enable indenting.
-	 */
-	public void setIndenting( final boolean indenting )
-	{
-		_indenting = indenting;
-	}
-
-	/**
-	 * Returns the string to be used as a newline. Only used when {@link
-	 * #isIndenting()} is {@code true}. The default is {@code "\n"}.
-	 *
-	 * @return String for newlines.
-	 */
-	public String getNewline()
-	{
-		return _newline;
-	}
-
-	/**
-	 * Sets the string to be used as a newline. Only used when {@link
-	 * #isIndenting()} is {@code true}. The default is {@code "\n"}.
-	 *
-	 * @param newline String for newlines.
-	 */
-	public void setNewline( final String newline )
-	{
-		_newline = newline;
-	}
-
-	/**
-	 * Returns the string to be used for indenting. Only used when {@link
-	 * #isIndenting()} is {@code true}. The default is {@code "\t"}.
-	 *
-	 * @return String for indenting.
-	 */
-	public String getIndent()
-	{
-		return _indent;
-	}
-
-	/**
-	 * Sets the string to be used for indenting. Only used when {@link
-	 * #isIndenting()} is {@code true}. The default is {@code "\t"}.
-	 *
-	 * @param indent String for indenting.
-	 */
-	public void setIndent( final String indent )
-	{
-		_indent = indent;
-	}
-
-	/**
-	 * Creates an XML writer.
-	 *
-	 * @param out      Stream to write to.
-	 * @param encoding Character encoding to be used.
-	 *
-	 * @return Created XML writer.
-	 *
-	 * @throws XMLException if an XML-related exception occurs.
-	 */
-	public abstract XMLWriter createXMLWriter( final OutputStream out, final String encoding )
-	throws XMLException;
-
-	/**
-	 * Creates an XML writer.
-	 *
-	 * @param writer   Character stream to write to.
-	 * @param encoding Character encoding to be used.
-	 *
-	 * @return Created XML writer.
-	 *
-	 * @throws XMLException if an XML-related exception occurs.
-	 */
 	public abstract XMLWriter createXMLWriter( Writer writer, String encoding )
-	throws XMLException;
+		throws XMLException;
 }

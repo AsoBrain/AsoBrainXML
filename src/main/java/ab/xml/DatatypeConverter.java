@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2021 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import java.math.*;
 import java.util.*;
 import javax.xml.datatype.*;
 
+import lombok.*;
+
 /**
  * Provides conversion of Java types to XML syntax. Replacement for {@code
  * javax.xml.bind.DatatypeConverter}, which is not available on all target
@@ -32,12 +34,14 @@ import javax.xml.datatype.*;
  *
  * @author G. Meinders
  */
+@NoArgsConstructor( access = AccessLevel.PRIVATE )
+@SuppressWarnings( "unused" )
 public class DatatypeConverter
 {
 	/**
 	 * Cached {@link DatatypeFactory} instance.
 	 */
-	private static DatatypeFactory _datatypeFactory = null;
+	private static DatatypeFactory datatypeFactory = null;
 
 	/**
 	 * Returns a {@link DatatypeFactory}.
@@ -46,20 +50,22 @@ public class DatatypeConverter
 	 */
 	private static DatatypeFactory getDatatypeFactory()
 	{
-		DatatypeFactory result = _datatypeFactory;
-		if ( result == null )
+		var result = datatypeFactory;
+		if ( result != null )
 		{
-			try
-			{
-				result = DatatypeFactory.newInstance();
-			}
-			catch ( final DatatypeConfigurationException e )
-			{
-				throw new RuntimeException( e );
-			}
-			_datatypeFactory = result;
+			return result;
 		}
-		return result;
+
+		try
+		{
+			result = DatatypeFactory.newInstance();
+			datatypeFactory = result;
+			return result;
+		}
+		catch ( DatatypeConfigurationException e )
+		{
+			throw new RuntimeException( e );
+		}
 	}
 
 	/**
@@ -70,20 +76,20 @@ public class DatatypeConverter
 	 *
 	 * @return String representation of the calendar's date and time.
 	 */
-	public static String printDateTime( final Calendar calendar )
+	public static String printDateTime( Calendar calendar )
 	{
-		final GregorianCalendar gregorianCalendar;
-		if ( calendar instanceof GregorianCalendar )
+		GregorianCalendar gregorianCalendar;
+		if ( calendar instanceof GregorianCalendar existing )
 		{
-			gregorianCalendar = (GregorianCalendar)calendar;
+			gregorianCalendar = existing;
 		}
 		else
 		{
 			gregorianCalendar = new GregorianCalendar( calendar.getTimeZone() );
 			gregorianCalendar.setTime( calendar.getTime() );
 		}
-		final DatatypeFactory datatypeFactory = getDatatypeFactory();
-		final XMLGregorianCalendar xmlGregorianCalendar = datatypeFactory.newXMLGregorianCalendar( gregorianCalendar );
+		var datatypeFactory = getDatatypeFactory();
+		var xmlGregorianCalendar = datatypeFactory.newXMLGregorianCalendar( gregorianCalendar );
 		return xmlGregorianCalendar.toXMLFormat();
 	}
 
@@ -96,10 +102,11 @@ public class DatatypeConverter
 	 *
 	 * @return String representation of the calendar's date and time.
 	 */
-	public static Calendar parseDateTime( final String value )
+	@SuppressWarnings( "UnusedReturnValue" )
+	public static Calendar parseDateTime( String value )
 	{
-		final DatatypeFactory datatypeFactory = getDatatypeFactory();
-		final XMLGregorianCalendar xmlGregorianCalendar = datatypeFactory.newXMLGregorianCalendar( value );
+		var datatypeFactory = getDatatypeFactory();
+		var xmlGregorianCalendar = datatypeFactory.newXMLGregorianCalendar( value );
 		return xmlGregorianCalendar.toGregorianCalendar();
 	}
 
@@ -114,29 +121,16 @@ public class DatatypeConverter
 	 *
 	 * @throws NumberFormatException {@code value} is not properly formatted.
 	 */
-	public static float parseFloat( final String value )
+	public static float parseFloat( String value )
 	{
-		final float result;
-
-		final String trimmed = value.trim();
-		if ( "INF".equals( trimmed ) )
+		var trimmed = value.trim();
+		return switch ( trimmed )
 		{
-			result = Float.POSITIVE_INFINITY;
-		}
-		else if ( "-INF".equals( trimmed ) )
-		{
-			result = Float.NEGATIVE_INFINITY;
-		}
-		else if ( "NaN".equals( trimmed ) )
-		{
-			result = Float.NaN;
-		}
-		else
-		{
-			result = Float.parseFloat( trimmed );
-		}
-
-		return result;
+			case "INF" -> Float.POSITIVE_INFINITY;
+			case "-INF" -> Float.NEGATIVE_INFINITY;
+			case "NaN" -> Float.NaN;
+			default -> Float.parseFloat( trimmed );
+		};
 	}
 
 	/**
@@ -150,29 +144,16 @@ public class DatatypeConverter
 	 *
 	 * @throws NumberFormatException {@code value} is not properly formatted.
 	 */
-	public static double parseDouble( final String value )
+	public static double parseDouble( String value )
 	{
-		final double result;
-
-		final String trimmed = value.trim();
-		if ( "INF".equals( trimmed ) )
+		var trimmed = value.trim();
+		return switch ( trimmed )
 		{
-			result = Double.POSITIVE_INFINITY;
-		}
-		else if ( "-INF".equals( trimmed ) )
-		{
-			result = Double.NEGATIVE_INFINITY;
-		}
-		else if ( "NaN".equals( trimmed ) )
-		{
-			result = Double.NaN;
-		}
-		else
-		{
-			result = Double.parseDouble( trimmed );
-		}
-
-		return result;
+			case "INF" -> Double.POSITIVE_INFINITY;
+			case "-INF" -> Double.NEGATIVE_INFINITY;
+			case "NaN" -> Double.NaN;
+			default -> Double.parseDouble( trimmed );
+		};
 	}
 
 	/**
@@ -186,7 +167,7 @@ public class DatatypeConverter
 	 *
 	 * @throws NumberFormatException {@code value} is not properly formatted.
 	 */
-	public static BigDecimal parseDecimal( final String value )
+	public static BigDecimal parseDecimal( String value )
 	{
 		return new BigDecimal( value.trim() );
 	}
@@ -199,7 +180,7 @@ public class DatatypeConverter
 	 *
 	 * @return String representation of the value.
 	 */
-	public static String printInt( final int v )
+	public static String printInt( int v )
 	{
 		return String.valueOf( v );
 	}
@@ -212,26 +193,12 @@ public class DatatypeConverter
 	 *
 	 * @return String representation of the value.
 	 */
-	public static String printFloat( final float v )
+	public static String printFloat( float v )
 	{
-		final String result;
-		if ( v == Float.POSITIVE_INFINITY )
-		{
-			result = "INF";
-		}
-		else if ( v == Float.NEGATIVE_INFINITY )
-		{
-			result = "-INF";
-		}
-		else if ( Float.isNaN( v ) )
-		{
-			result = "NaN";
-		}
-		else
-		{
-			result = String.valueOf( v );
-		}
-		return result;
+		return ( v == Float.POSITIVE_INFINITY ) ? "INF" :
+		       ( v == Float.NEGATIVE_INFINITY ) ? "-INF" :
+		       Float.isNaN( v ) ? "NaN" :
+		       String.valueOf( v );
 	}
 
 	/**
@@ -242,26 +209,12 @@ public class DatatypeConverter
 	 *
 	 * @return String representation of the value.
 	 */
-	public static String printDouble( final double v )
+	public static String printDouble( double v )
 	{
-		final String result;
-		if ( v == Double.POSITIVE_INFINITY )
-		{
-			result = "INF";
-		}
-		else if ( v == Double.NEGATIVE_INFINITY )
-		{
-			result = "-INF";
-		}
-		else if ( Double.isNaN( v ) )
-		{
-			result = "NaN";
-		}
-		else
-		{
-			result = String.valueOf( v );
-		}
-		return result;
+		return ( v == Double.POSITIVE_INFINITY ) ? "INF" :
+		       ( v == Double.NEGATIVE_INFINITY ) ? "-INF" :
+		       Double.isNaN( v ) ? "NaN" :
+		       String.valueOf( v );
 	}
 
 	/**
@@ -272,7 +225,7 @@ public class DatatypeConverter
 	 *
 	 * @return String with lexical representation of {@code decimal}.
 	 */
-	public static String printDecimal( final BigDecimal value )
+	public static String printDecimal( BigDecimal value )
 	{
 		return value.toPlainString();
 	}

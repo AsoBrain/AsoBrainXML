@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2022 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,8 +20,6 @@ package ab.xml;
 
 import javax.xml.stream.*;
 
-import org.jetbrains.annotations.*;
-
 /**
  * XML reader implementation that uses StAX, the Streaming API for XML.
  *
@@ -33,50 +31,42 @@ implements XMLReader
 	/**
 	 * StAX reader to be used.
 	 */
-	private final XMLStreamReader _reader;
+	private final XMLStreamReader reader;
 
 	/**
 	 * Event type returned by the last call to {@link #next()}.
 	 */
-	@NotNull
-	private XMLEventType _eventType;
+	private XMLEventType eventType;
 
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param reader StAX reader to be used.
-	 */
-	StaxReader( final XMLStreamReader reader )
+	StaxReader( XMLStreamReader reader )
 	{
-		_reader = reader;
-		_eventType = XMLEventType.START_DOCUMENT;
+		this.reader = reader;
+		eventType = XMLEventType.START_DOCUMENT;
 	}
 
 	@Override
-	@NotNull
 	public XMLEventType getEventType()
 	{
-		return _eventType;
+		return eventType;
 	}
 
 	@Override
-	@NotNull
 	public XMLEventType next()
 	throws XMLException
 	{
-		if ( _eventType == XMLEventType.END_DOCUMENT )
+		if ( eventType == XMLEventType.END_DOCUMENT )
 		{
-			throw new IllegalStateException( "Not allowed after " + XMLEventType.END_DOCUMENT + " event." );
+			throw new IllegalStateException( "Not allowed after %s event.".formatted( XMLEventType.END_DOCUMENT ) );
 		}
 
 		try
 		{
-			if ( !_reader.hasNext() )
+			if ( !reader.hasNext() )
 			{
 				throw new XMLException( "Unexpected end of document." );
 			}
 		}
-		catch ( final XMLStreamException e )
+		catch ( XMLStreamException e )
 		{
 			throw new XMLException( e );
 		}
@@ -84,85 +74,39 @@ implements XMLReader
 		XMLEventType result;
 		do
 		{
-			final int eventType;
+			int type;
 			try
 			{
-				eventType = _reader.next();
+				type = reader.next();
 			}
-			catch ( final XMLStreamException e )
+			catch ( XMLStreamException e )
 			{
 				throw new XMLException( e );
 			}
 
-			switch ( eventType )
+			result = switch ( type )
 			{
-				case XMLStreamConstants.START_ELEMENT:
-					result = XMLEventType.START_ELEMENT;
-					break;
-
-				case XMLStreamConstants.END_ELEMENT:
-					result = XMLEventType.END_ELEMENT;
-					break;
-
-				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					result = XMLEventType.PROCESSING_INSTRUCTION;
-					break;
-
-				case XMLStreamConstants.CHARACTERS:
-					result = XMLEventType.CHARACTERS;
-					break;
-
-				case XMLStreamConstants.COMMENT:
-					result = null;
-					break;
-
-				case XMLStreamConstants.SPACE:
-					result = XMLEventType.CHARACTERS;
-					break;
-
-				case XMLStreamConstants.START_DOCUMENT:
-					result = XMLEventType.START_DOCUMENT;
-					break;
-
-				case XMLStreamConstants.END_DOCUMENT:
-					result = XMLEventType.END_DOCUMENT;
-					break;
-
-				case XMLStreamConstants.ENTITY_REFERENCE:
-					result = XMLEventType.CHARACTERS;
-					break;
-
-				case XMLStreamConstants.ATTRIBUTE:
-					result = null;
-					break;
-
-				case XMLStreamConstants.DTD:
-					result = XMLEventType.DTD;
-					break;
-
-				case XMLStreamConstants.CDATA:
-					result = XMLEventType.CHARACTERS;
-					break;
-
-				case XMLStreamConstants.NAMESPACE:
-					result = null;
-					break;
-
-				case XMLStreamConstants.NOTATION_DECLARATION:
-					result = null;
-					break;
-
-				case XMLStreamConstants.ENTITY_DECLARATION:
-					result = null;
-					break;
-
-				default:
-					throw new XMLException( "Unknown event type: " + eventType );
-			}
+				case XMLStreamConstants.START_ELEMENT -> XMLEventType.START_ELEMENT;
+				case XMLStreamConstants.END_ELEMENT -> XMLEventType.END_ELEMENT;
+				case XMLStreamConstants.PROCESSING_INSTRUCTION -> XMLEventType.PROCESSING_INSTRUCTION;
+				case XMLStreamConstants.CHARACTERS,
+				     XMLStreamConstants.CDATA,
+				     XMLStreamConstants.ENTITY_REFERENCE,
+				     XMLStreamConstants.SPACE -> XMLEventType.CHARACTERS;
+				case XMLStreamConstants.COMMENT,
+				     XMLStreamConstants.ENTITY_DECLARATION,
+				     XMLStreamConstants.NOTATION_DECLARATION,
+				     XMLStreamConstants.NAMESPACE,
+				     XMLStreamConstants.ATTRIBUTE -> null;
+				case XMLStreamConstants.START_DOCUMENT -> XMLEventType.START_DOCUMENT;
+				case XMLStreamConstants.END_DOCUMENT -> XMLEventType.END_DOCUMENT;
+				case XMLStreamConstants.DTD -> XMLEventType.DTD;
+				default -> throw new XMLException( "Unknown event type: " + type );
+			};
 		}
 		while ( result == null );
 
-		_eventType = result;
+		eventType = result;
 
 		return result;
 	}
@@ -170,64 +114,41 @@ implements XMLReader
 	@Override
 	public String getNamespaceURI()
 	{
-		final XMLEventType eventType = _eventType;
 		if ( ( eventType != XMLEventType.START_ELEMENT ) &&
 		     ( eventType != XMLEventType.END_ELEMENT ) )
 		{
 			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return _reader.getNamespaceURI();
+		return reader.getNamespaceURI();
 	}
 
 	@Override
-	@NotNull
 	public String getLocalName()
 	{
-		final XMLEventType eventType = _eventType;
 		if ( ( eventType != XMLEventType.START_ELEMENT ) &&
 		     ( eventType != XMLEventType.END_ELEMENT ) )
 		{
 			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return _reader.getLocalName();
+		return reader.getLocalName();
 	}
 
 	@Override
 	public int getAttributeCount()
 	{
-		final XMLEventType eventType = _eventType;
 		if ( eventType != XMLEventType.START_ELEMENT )
 		{
 			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return _reader.getAttributeCount();
+		return reader.getAttributeCount();
 	}
 
 	@Override
-	public String getAttributeNamespaceURI( final int index )
+	public String getAttributeNamespaceURI( int index )
 	{
-		final XMLEventType eventType = _eventType;
-		if ( eventType != XMLEventType.START_ELEMENT )
-		{
-			throw new IllegalStateException( "Not allowed for " + eventType );
-		}
-
-		if ( ( index < 0 ) || ( index >= getAttributeCount() ) )
-		{
-			throw new IndexOutOfBoundsException( index + " (attributeCount: " + getAttributeCount() + ')' );
-		}
-
-		return _reader.getAttributeNamespace( index );
-	}
-
-	@Override
-	@NotNull
-	public String getAttributeLocalName( final int index )
-	{
-		final XMLEventType eventType = _eventType;
 		if ( eventType != XMLEventType.START_ELEMENT )
 		{
 			throw new IllegalStateException( "Not allowed for " + eventType );
@@ -238,14 +159,12 @@ implements XMLReader
 			throw new IndexOutOfBoundsException( index + " (attributeCount: " + getAttributeCount() + ')' );
 		}
 
-		return _reader.getAttributeLocalName( index );
+		return reader.getAttributeNamespace( index );
 	}
 
 	@Override
-	@NotNull
-	public String getAttributeValue( final int index )
+	public String getAttributeLocalName( int index )
 	{
-		final XMLEventType eventType = _eventType;
 		if ( eventType != XMLEventType.START_ELEMENT )
 		{
 			throw new IllegalStateException( "Not allowed for " + eventType );
@@ -256,13 +175,28 @@ implements XMLReader
 			throw new IndexOutOfBoundsException( index + " (attributeCount: " + getAttributeCount() + ')' );
 		}
 
-		return _reader.getAttributeValue( index );
+		return reader.getAttributeLocalName( index );
 	}
 
 	@Override
-	public String getAttributeValue( @NotNull final String localName )
+	public String getAttributeValue( int index )
 	{
-		final XMLEventType eventType = _eventType;
+		if ( eventType != XMLEventType.START_ELEMENT )
+		{
+			throw new IllegalStateException( "Not allowed for " + eventType );
+		}
+
+		if ( ( index < 0 ) || ( index >= getAttributeCount() ) )
+		{
+			throw new IndexOutOfBoundsException( index + " (attributeCount: " + getAttributeCount() + ')' );
+		}
+
+		return reader.getAttributeValue( index );
+	}
+
+	@Override
+	public String getAttributeValue( String localName )
+	{
 		if ( eventType != XMLEventType.START_ELEMENT )
 		{
 			throw new IllegalStateException( "Not allowed for " + eventType );
@@ -270,12 +204,12 @@ implements XMLReader
 
 		String result = null;
 
-		final int attributeCount = _reader.getAttributeCount();
-		for ( int i = 0; i < attributeCount; i++ )
+		var attributeCount = reader.getAttributeCount();
+		for ( var i = 0; i < attributeCount; i++ )
 		{
-			if ( localName.equals( _reader.getAttributeLocalName( i ) ) )
+			if ( localName.equals( reader.getAttributeLocalName( i ) ) )
 			{
-				result = _reader.getAttributeValue( i );
+				result = reader.getAttributeValue( i );
 				break;
 			}
 		}
@@ -284,62 +218,58 @@ implements XMLReader
 	}
 
 	@Override
-	public String getAttributeValue( final String namespaceURI, @NotNull final String localName )
+	public String getAttributeValue( String namespaceURI, String localName )
 	{
-		final XMLEventType eventType = _eventType;
 		if ( eventType != XMLEventType.START_ELEMENT )
 		{
 			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return _reader.getAttributeValue( namespaceURI, localName );
+		return reader.getAttributeValue( namespaceURI, localName );
 	}
 
 	@Override
-	@NotNull
 	public String getText()
 	{
-		if ( _eventType != XMLEventType.CHARACTERS )
+		if ( eventType != XMLEventType.CHARACTERS )
 		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
+			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return _reader.getText();
+		return reader.getText();
 	}
 
 	@Override
-	@NotNull
 	public String getPITarget()
 	{
-		if ( _eventType != XMLEventType.PROCESSING_INSTRUCTION )
+		if ( eventType != XMLEventType.PROCESSING_INSTRUCTION )
 		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
+			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return _reader.getPITarget();
+		return reader.getPITarget();
 	}
 
 	@Override
-	@NotNull
 	public String getPIData()
 	{
-		if ( _eventType != XMLEventType.PROCESSING_INSTRUCTION )
+		if ( eventType != XMLEventType.PROCESSING_INSTRUCTION )
 		{
-			throw new IllegalStateException( "Not allowed for " + _eventType );
+			throw new IllegalStateException( "Not allowed for " + eventType );
 		}
 
-		return _reader.getPIData();
+		return reader.getPIData();
 	}
 
 	@Override
 	public int getLineNumber()
 	{
-		return _reader.getLocation().getLineNumber();
+		return reader.getLocation().getLineNumber();
 	}
 
 	@Override
 	public int getColumnNumber()
 	{
-		return _reader.getLocation().getColumnNumber();
+		return reader.getLocation().getColumnNumber();
 	}
 }

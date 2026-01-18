@@ -1,6 +1,6 @@
 /*
  * AsoBrain XML Library
- * Copyright (C) 1999-2011 Peter S. Heijnen
+ * Copyright (C) 1999-2026 Peter S. Heijnen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,8 @@
  */
 package ab.xml;
 
-import org.jetbrains.annotations.*;
+import lombok.*;
+import org.jspecify.annotations.*;
 import org.xmlpull.v1.*;
 
 /**
@@ -26,45 +27,35 @@ import org.xmlpull.v1.*;
  *
  * @author G. Meinders
  */
+@RequiredArgsConstructor( access = AccessLevel.PACKAGE )
+@SuppressWarnings( "unused" )
 class XmlPullWriter
-implements XMLWriter
+	implements XMLWriter
 {
 	/**
 	 * XML Pull serializer to be used.
 	 */
-	private final XmlSerializer _serializer;
+	private final XmlSerializer serializer;
 
 	/**
 	 * Character encoding of the XML document.
 	 */
-	private final String _encoding;
+	private final String encoding;
 
 	/**
 	 * {@code true} if the writer is currently writing an empty tag.
 	 */
-	private boolean _empty = false;
-
-	/**
-	 * Constructs a new instance.
-	 *
-	 * @param serializer XML Pull serializer to be used.
-	 * @param encoding   Character encoding of the XML document.
-	 */
-	XmlPullWriter( final XmlSerializer serializer, final String encoding )
-	{
-		_serializer = serializer;
-		_encoding = encoding;
-	}
+	private boolean empty = false;
 
 	@Override
-	public void setPrefix( @NotNull final String prefix, @NotNull final String namespaceURI )
-	throws XMLException
+	public void setPrefix( String prefix, String namespaceURI )
+		throws XMLException
 	{
 		try
 		{
-			_serializer.setPrefix( prefix, namespaceURI );
+			serializer.setPrefix( prefix, namespaceURI );
 		}
-		catch ( final Exception e )
+		catch ( Exception e )
 		{
 			throw new XMLException( e );
 		}
@@ -72,92 +63,92 @@ implements XMLWriter
 
 	@Override
 	public void startDocument()
-	throws XMLException
+		throws XMLException
 	{
 		try
 		{
-			_serializer.startDocument( _encoding, null );
+			serializer.startDocument( encoding, null );
 		}
-		catch ( final Exception e )
+		catch ( Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
 	@Override
-	public void startTag( final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	public void startTag( @Nullable String namespaceURI, String localName )
+		throws XMLException
 	{
-		if ( _empty )
+		if ( empty )
 		{
 			throw new XMLException( "Not allowed inside an empty tag. Use 'endTag' first." );
 		}
 
 		try
 		{
-			_serializer.startTag( namespaceURI, localName );
+			serializer.startTag( namespaceURI, localName );
 		}
-		catch ( final Exception e )
+		catch ( Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
 	@Override
-	public void emptyTag( @Nullable final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	public void emptyTag( @Nullable String namespaceURI, String localName )
+		throws XMLException
 	{
 		startTag( namespaceURI, localName );
-		_empty = true;
+		empty = true;
 	}
 
 	@Override
-	public void attribute( final String namespaceURI, @NotNull final String localName, @NotNull final String value )
-	throws XMLException
+	public void attribute( @Nullable String namespaceURI, String localName, String value )
+		throws XMLException
 	{
 		try
 		{
-			_serializer.attribute( namespaceURI, localName, value );
+			serializer.attribute( namespaceURI, localName, value );
 		}
-		catch ( final Exception e )
+		catch ( Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
 	@Override
-	public void text( @NotNull final String characters )
-	throws XMLException
+	public void text( String characters )
+		throws XMLException
 	{
-		if ( _empty )
+		if ( empty )
 		{
 			throw new XMLException( "Not allowed inside an empty tag. Use 'endTag' first." );
 		}
 
 		try
 		{
-			_serializer.text( characters );
+			serializer.text( characters );
 		}
-		catch ( final Exception e )
+		catch ( Exception e )
 		{
 			throw new XMLException( e );
 		}
 	}
 
 	@Override
-	public void endTag( final String namespaceURI, @NotNull final String localName )
-	throws XMLException
+	public void endTag( @Nullable String namespaceURI, String localName )
+		throws XMLException
 	{
-		if ( _empty )
+		if ( empty )
 		{
-			_empty = false;
+			empty = false;
 		}
 
 		try
 		{
-			_serializer.endTag( namespaceURI, localName );
+			serializer.endTag( namespaceURI, localName );
 		}
-		catch ( final Exception e )
+		catch ( Exception e )
 		{
 			throw new XMLException( e );
 		}
@@ -165,13 +156,13 @@ implements XMLWriter
 
 	@Override
 	public void endDocument()
-	throws XMLException
+		throws XMLException
 	{
 		try
 		{
-			_serializer.endDocument();
+			serializer.endDocument();
 		}
-		catch ( final Exception e )
+		catch ( Exception e )
 		{
 			throw new XMLException( e );
 		}
@@ -179,13 +170,13 @@ implements XMLWriter
 
 	@Override
 	public void flush()
-	throws XMLException
+		throws XMLException
 	{
 		try
 		{
-			_serializer.flush();
+			serializer.flush();
 		}
-		catch ( final Exception e )
+		catch ( Exception e )
 		{
 			throw new XMLException( e );
 		}
