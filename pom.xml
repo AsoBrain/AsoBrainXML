@@ -6,7 +6,7 @@
 
 	<groupId>com.asobrain.xml</groupId>
 	<artifactId>abxml</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
+	<version>2.0.0</version>
 	<description>Very basic XML reader/writer library wrapper on top of Stax or XmlPull.</description>
 	<url>https://github.com/AsoBrain/AsoBrainXML</url>
 
